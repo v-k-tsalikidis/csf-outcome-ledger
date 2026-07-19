@@ -1,0 +1,515 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.invalid/csf-outcome-ledger/workspace-v0.1.schema.json",
+  "title": "CSF Outcome Ledger Workspace",
+  "description": "Canonical metadata-only workspace export for the CSF Outcome Ledger research model.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "workspaceId",
+    "title",
+    "createdAt",
+    "updatedAt",
+    "framework",
+    "scope",
+    "activities",
+    "evidence",
+    "mappings",
+    "targets"
+  ],
+  "properties": {
+    "schemaVersion": {
+      "const": "0.1.0"
+    },
+    "workspaceId": {
+      "$ref": "#/$defs/uuid"
+    },
+    "title": {
+      "$ref": "#/$defs/title"
+    },
+    "createdAt": {
+      "$ref": "#/$defs/dateTime"
+    },
+    "updatedAt": {
+      "$ref": "#/$defs/dateTime"
+    },
+    "framework": {
+      "$ref": "#/$defs/framework"
+    },
+    "scope": {
+      "$ref": "#/$defs/scope"
+    },
+    "activities": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/activity"
+      }
+    },
+    "evidence": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/evidence"
+      }
+    },
+    "mappings": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/mapping"
+      }
+    },
+    "targets": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/target"
+      }
+    }
+  },
+  "$defs": {
+    "uuid": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "date": {
+      "type": "string",
+      "format": "date"
+    },
+    "dateTime": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "title": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 200
+    },
+    "shortText": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 500
+    },
+    "longText": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 4000
+    },
+    "sha256": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "gitSha": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{40}$"
+    },
+    "outcomeId": {
+      "type": "string",
+      "pattern": "^(GV|ID|PR|DE|RS|RC)\\.[A-Z]{2}-[0-9]{2}$"
+    },
+    "framework": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "catalogVersion",
+        "sourceTag",
+        "sourceCommit",
+        "sourceSha256",
+        "normalizedSha256",
+        "retrievedAt"
+      ],
+      "properties": {
+        "id": {
+          "const": "nist-csf-2.0"
+        },
+        "catalogVersion": {
+          "$ref": "#/$defs/shortText"
+        },
+        "sourceTag": {
+          "$ref": "#/$defs/shortText"
+        },
+        "sourceCommit": {
+          "$ref": "#/$defs/gitSha"
+        },
+        "sourceSha256": {
+          "$ref": "#/$defs/sha256"
+        },
+        "normalizedSha256": {
+          "$ref": "#/$defs/sha256"
+        },
+        "retrievedAt": {
+          "$ref": "#/$defs/dateTime"
+        }
+      }
+    },
+    "scope": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "title",
+        "purpose",
+        "boundary",
+        "ownerRole",
+        "createdAt",
+        "reviewDueAt",
+        "assumptions",
+        "exclusions"
+      ],
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/uuid"
+        },
+        "title": {
+          "$ref": "#/$defs/title"
+        },
+        "purpose": {
+          "$ref": "#/$defs/longText"
+        },
+        "boundary": {
+          "$ref": "#/$defs/longText"
+        },
+        "ownerRole": {
+          "$ref": "#/$defs/shortText"
+        },
+        "createdAt": {
+          "$ref": "#/$defs/dateTime"
+        },
+        "reviewDueAt": {
+          "$ref": "#/$defs/date"
+        },
+        "assumptions": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/shortText"
+          }
+        },
+        "exclusions": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/shortText"
+          }
+        }
+      }
+    },
+    "activity": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "kind",
+        "statement",
+        "responsibleRole",
+        "createdAt",
+        "updatedAt"
+      ],
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/uuid"
+        },
+        "kind": {
+          "enum": [
+            "claim",
+            "practice"
+          ]
+        },
+        "statement": {
+          "$ref": "#/$defs/longText"
+        },
+        "responsibleRole": {
+          "$ref": "#/$defs/shortText"
+        },
+        "cadence": {
+          "$ref": "#/$defs/shortText"
+        },
+        "sourceRevision": {
+          "$ref": "#/$defs/shortText"
+        },
+        "fingerprint": {
+          "$ref": "#/$defs/sha256"
+        },
+        "createdAt": {
+          "$ref": "#/$defs/dateTime"
+        },
+        "updatedAt": {
+          "$ref": "#/$defs/dateTime"
+        }
+      }
+    },
+    "evidence": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "title",
+        "evidenceType",
+        "responsibleRole",
+        "producedAt",
+        "reviewDueAt",
+        "sensitivity",
+        "createdAt",
+        "updatedAt"
+      ],
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/uuid"
+        },
+        "title": {
+          "$ref": "#/$defs/title"
+        },
+        "evidenceType": {
+          "enum": [
+            "policy",
+            "procedure",
+            "configuration",
+            "test-result",
+            "audit-record",
+            "operational-record",
+            "approval-record",
+            "other"
+          ]
+        },
+        "responsibleRole": {
+          "$ref": "#/$defs/shortText"
+        },
+        "producedAt": {
+          "$ref": "#/$defs/date"
+        },
+        "reviewedAt": {
+          "$ref": "#/$defs/date"
+        },
+        "reviewDueAt": {
+          "$ref": "#/$defs/date"
+        },
+        "referenceLabel": {
+          "$ref": "#/$defs/shortText"
+        },
+        "fingerprint": {
+          "$ref": "#/$defs/sha256"
+        },
+        "sensitivity": {
+          "enum": [
+            "public",
+            "internal",
+            "restricted"
+          ]
+        },
+        "createdAt": {
+          "$ref": "#/$defs/dateTime"
+        },
+        "updatedAt": {
+          "$ref": "#/$defs/dateTime"
+        }
+      }
+    },
+    "mapping": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "subjectType",
+        "subjectId",
+        "outcomeId",
+        "decision",
+        "support",
+        "rationaleBasis",
+        "rationale",
+        "frameworkCatalogVersion",
+        "outcomeFingerprint",
+        "subjectFingerprint",
+        "createdAt"
+      ],
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/uuid"
+        },
+        "subjectType": {
+          "enum": [
+            "activity",
+            "evidence"
+          ]
+        },
+        "subjectId": {
+          "$ref": "#/$defs/uuid"
+        },
+        "outcomeId": {
+          "$ref": "#/$defs/outcomeId"
+        },
+        "decision": {
+          "enum": [
+            "candidate",
+            "accepted",
+            "rejected",
+            "needs-review"
+          ]
+        },
+        "support": {
+          "enum": [
+            "none",
+            "partial",
+            "sufficient"
+          ]
+        },
+        "rationaleBasis": {
+          "enum": [
+            "syntactic",
+            "semantic",
+            "functional"
+          ]
+        },
+        "rationale": {
+          "$ref": "#/$defs/longText"
+        },
+        "reviewerAlias": {
+          "$ref": "#/$defs/shortText"
+        },
+        "decidedAt": {
+          "$ref": "#/$defs/dateTime"
+        },
+        "reviewDueAt": {
+          "$ref": "#/$defs/date"
+        },
+        "frameworkCatalogVersion": {
+          "$ref": "#/$defs/shortText"
+        },
+        "outcomeFingerprint": {
+          "$ref": "#/$defs/sha256"
+        },
+        "subjectFingerprint": {
+          "$ref": "#/$defs/sha256"
+        },
+        "supersedesId": {
+          "$ref": "#/$defs/uuid"
+        },
+        "createdAt": {
+          "$ref": "#/$defs/dateTime"
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "decision": {
+                "const": "accepted"
+              }
+            },
+            "required": [
+              "decision"
+            ]
+          },
+          "then": {
+            "properties": {
+              "support": {
+                "enum": [
+                  "partial",
+                  "sufficient"
+                ]
+              }
+            },
+            "required": [
+              "reviewerAlias",
+              "decidedAt",
+              "reviewDueAt"
+            ]
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "decision": {
+                "const": "rejected"
+              }
+            },
+            "required": [
+              "decision"
+            ]
+          },
+          "then": {
+            "properties": {
+              "support": {
+                "const": "none"
+              }
+            },
+            "required": [
+              "reviewerAlias",
+              "decidedAt"
+            ]
+          }
+        }
+      ]
+    },
+    "target": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "outcomeId",
+        "applicability",
+        "rationale",
+        "ownerRole",
+        "createdAt",
+        "updatedAt"
+      ],
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/uuid"
+        },
+        "outcomeId": {
+          "$ref": "#/$defs/outcomeId"
+        },
+        "applicability": {
+          "enum": [
+            "included",
+            "out-of-scope",
+            "not-applicable"
+          ]
+        },
+        "priority": {
+          "enum": [
+            "low",
+            "medium",
+            "high",
+            "critical"
+          ]
+        },
+        "goal": {
+          "$ref": "#/$defs/longText"
+        },
+        "rationale": {
+          "$ref": "#/$defs/longText"
+        },
+        "ownerRole": {
+          "$ref": "#/$defs/shortText"
+        },
+        "targetDate": {
+          "$ref": "#/$defs/date"
+        },
+        "createdAt": {
+          "$ref": "#/$defs/dateTime"
+        },
+        "updatedAt": {
+          "$ref": "#/$defs/dateTime"
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "applicability": {
+                "const": "included"
+              }
+            },
+            "required": [
+              "applicability"
+            ]
+          },
+          "then": {
+            "required": [
+              "priority",
+              "goal"
+            ]
+          }
+        }
+      ]
+    }
+  }
+}

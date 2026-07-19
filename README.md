@@ -21,6 +21,9 @@ The problem statement, comparable solutions, methodology boundaries, privacy pos
 5. Distinguish supported, unsupported, stale, unresolved, and out-of-scope records.
 6. Export the decision ledger and Current/Target Profile views.
 
+A schema-valid fictional record is available at
+[`examples/synthetic-workspace.json`](examples/synthetic-workspace.json).
+
 ## Design Commitments
 
 - Local-first and usable without an account.
@@ -37,6 +40,9 @@ The problem statement, comparable solutions, methodology boundaries, privacy pos
 - [Differentiation brief](docs/DIFFERENTIATION_BRIEF.md)
 - [Research sources](docs/RESEARCH_SOURCES.md)
 - [Methodology specification](docs/METHODOLOGY_SPEC.md)
+- [Mapping examples](docs/MAPPING_EXAMPLES.md)
+- [Source-data policy](docs/SOURCE_DATA_POLICY.md)
+- [Architecture](docs/ARCHITECTURE.md)
 - [Release gate](docs/RELEASE_GATE.md)
 
 ## Independence And Use

@@ -7,15 +7,15 @@
 - [x] Comparable open-source tools reviewed.
 - [x] Differentiation and non-goals documented.
 - [x] Public-safe data boundary documented.
-- [ ] Mapping semantics accepted after worked examples.
-- [ ] Official CSF dataset acquisition and transformation policy verified.
-- [ ] Product name and repository slug confirmed.
+- [x] Mapping semantics accepted after worked examples.
+- [x] Official CSF dataset acquisition and transformation policy verified.
+- [x] Product name and repository slug confirmed: `CSF Outcome Ledger` / `csf-outcome-ledger`.
 
 ## Architecture Gate
 
-- [ ] Versioned schemas for scope, activity, evidence, mapping, target, and export records.
+- [x] Versioned schema for scope, activity, evidence, mapping, target, and canonical export records.
 - [ ] Local persistence threat/privacy model.
-- [ ] Source-data provenance and update manifest.
+- [x] Source-data provenance and update-manifest policy.
 - [ ] Import/export validation and migration strategy.
 - [ ] Architecture decision records for framework and persistence choices.
 

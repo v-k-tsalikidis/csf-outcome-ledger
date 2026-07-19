@@ -1,0 +1,92 @@
+{
+  "schemaVersion": "0.1.0",
+  "workspaceId": "75aa94ca-b7c2-4eb0-b0e5-86fed27ac250",
+  "title": "Fictional Municipal Services Profile",
+  "createdAt": "2026-07-19T09:00:00Z",
+  "updatedAt": "2026-07-19T10:30:00Z",
+  "framework": {
+    "id": "nist-csf-2.0",
+    "catalogVersion": "1.2.0",
+    "sourceTag": "v1.5.0",
+    "sourceCommit": "78650f02ad9321bb7b817846f8fbd4f2bcd620de",
+    "sourceSha256": "4836943f21d393f2821df85ada4e6f3c0617243b4ddf44263fe68205400210b4",
+    "normalizedSha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+    "retrievedAt": "2026-07-19T08:30:00Z"
+  },
+  "scope": {
+    "id": "a4e72498-486b-443d-90c5-4d776e9b01be",
+    "title": "Public appointment service",
+    "purpose": "Demonstrate a metadata-only Current and Target Profile workflow using fictional records.",
+    "boundary": "The fictional public appointment web service, its supporting application, and its backup process.",
+    "ownerRole": "Service risk owner",
+    "createdAt": "2026-07-19T09:00:00Z",
+    "reviewDueAt": "2027-01-19",
+    "assumptions": [
+      "All records and roles are fictional."
+    ],
+    "exclusions": [
+      "Third-party payment processing is outside this demonstration scope."
+    ]
+  },
+  "activities": [
+    {
+      "id": "3c27aa8c-906f-4c75-aa40-97c18e2ccfe2",
+      "kind": "practice",
+      "statement": "The service owner reviews backup-job results weekly and completes a quarterly restore test.",
+      "responsibleRole": "Service owner",
+      "cadence": "Weekly review and quarterly restore test",
+      "fingerprint": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+      "createdAt": "2026-07-19T09:10:00Z",
+      "updatedAt": "2026-07-19T09:10:00Z"
+    }
+  ],
+  "evidence": [
+    {
+      "id": "90d9d0b2-c786-4383-9bc1-398d6c66a65d",
+      "title": "Fictional Backup Job Review - 2026 Q2",
+      "evidenceType": "operational-record",
+      "responsibleRole": "Service owner",
+      "producedAt": "2026-07-02",
+      "reviewedAt": "2026-07-19",
+      "reviewDueAt": "2027-01-02",
+      "referenceLabel": "DEMO-BACKUP-Q2",
+      "fingerprint": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+      "sensitivity": "public",
+      "createdAt": "2026-07-19T09:20:00Z",
+      "updatedAt": "2026-07-19T09:20:00Z"
+    }
+  ],
+  "mappings": [
+    {
+      "id": "596fa11b-e21e-45ba-b4a5-f6ac1d9c3b0d",
+      "subjectType": "evidence",
+      "subjectId": "90d9d0b2-c786-4383-9bc1-398d6c66a65d",
+      "outcomeId": "PR.DS-11",
+      "decision": "accepted",
+      "support": "sufficient",
+      "rationaleBasis": "functional",
+      "rationale": "The record supports regular backup review and restore testing within the stated demonstration scope.",
+      "reviewerAlias": "Demo reviewer",
+      "decidedAt": "2026-07-19T10:00:00Z",
+      "reviewDueAt": "2027-01-02",
+      "frameworkCatalogVersion": "1.2.0",
+      "outcomeFingerprint": "dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd",
+      "subjectFingerprint": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+      "createdAt": "2026-07-19T10:00:00Z"
+    }
+  ],
+  "targets": [
+    {
+      "id": "f746b48b-58c5-4611-b0ea-c8b06c90f1b5",
+      "outcomeId": "PR.DS-11",
+      "applicability": "included",
+      "priority": "high",
+      "goal": "Maintain current evidence for backup creation, protection, maintenance, and restore testing.",
+      "rationale": "Service recovery depends on reliable and tested backups.",
+      "ownerRole": "Service risk owner",
+      "targetDate": "2026-12-31",
+      "createdAt": "2026-07-19T10:15:00Z",
+      "updatedAt": "2026-07-19T10:15:00Z"
+    }
+  ]
+}
