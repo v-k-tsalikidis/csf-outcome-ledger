@@ -63,11 +63,12 @@ CSF Outcome Ledger is built **local-first**:
 
 ## 📄 Documentation & Guides
 
-- [Troubleshooting & Execution Guide](docs/TROUBLESHOOTING.md)
-- [LinkedIn Launch Presentation](docs/LINKEDIN_LAUNCH_POST.md)
-- [Differentiation Brief](docs/DIFFERENTIATION_BRIEF.md)
-- [Methodology Specification](docs/METHODOLOGY_SPEC.md)
-- [Architecture & Design Tokens](docs/ARCHITECTURE.md)
+- [📖 Step-by-Step User Manual](docs/USER_MANUAL.md)
+- [🛠️ Troubleshooting & Setup Guide](docs/TROUBLESHOOTING.md)
+- [📢 LinkedIn Launch Presentation](docs/LINKEDIN_LAUNCH_POST.md)
+- [💡 Differentiation Brief](docs/DIFFERENTIATION_BRIEF.md)
+- [📐 Methodology Specification](docs/METHODOLOGY_SPEC.md)
+- [🏛️ Architecture & Design Tokens](docs/ARCHITECTURE.md)
 
 ---
 
