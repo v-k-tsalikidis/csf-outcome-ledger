@@ -15,9 +15,9 @@ export const CisoBoardReportModal: React.FC<CisoBoardReportModalProps> = ({
   threatIndex,
   onClose
 }) => {
-  const supportedCount = Object.values(decisions).filter(d => d.status === 'SUPPORTED').length;
-  const gapCount = Object.values(decisions).filter(d => d.status === 'UNSUPPORTED').length;
-  const staleCount = Object.values(decisions).filter(d => d.status === 'STALE').length;
+  const supportedCount = outcomes.filter(o => (decisions[o.id]?.status || 'UNSUPPORTED') === 'SUPPORTED').length;
+  const gapCount = outcomes.filter(o => (decisions[o.id]?.status || 'UNSUPPORTED') === 'UNSUPPORTED').length;
+  const staleCount = outcomes.filter(o => (decisions[o.id]?.status || 'UNSUPPORTED') === 'STALE').length;
 
   const handlePrint = () => {
     window.print();
