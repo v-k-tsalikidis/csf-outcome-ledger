@@ -7,13 +7,16 @@ import { RiskDrawer } from './components/RiskDrawer';
 import { TopologyMap } from './components/TopologyMap';
 import { CisoBoardReportModal } from './components/CisoBoardReportModal';
 import { ProfileTierWidget } from './components/ProfileTierWidget';
+import { AddOutcomeModal } from './components/AddOutcomeModal';
 import { NIST_CSF_OUTCOMES } from './data/nistCsfData';
 import { fetchCisaKevThreatFeed } from './services/cisaKevApi';
-import { OutcomeDecision, MappingStatus, EvidenceRecord, RiskContext, CisaKevEntry, ThreatIndex } from './types/ledger';
+import { OutcomeDecision, MappingStatus, EvidenceRecord, RiskContext, CisaKevEntry, ThreatIndex, NistOutcome } from './types/ledger';
 
 const LOCAL_STORAGE_KEY = 'csf_outcome_ledger_decisions_v1';
+const LOCAL_STORAGE_OUTCOMES_KEY = 'csf_outcome_ledger_custom_outcomes_v1';
 
 export function App() {
+  const [outcomes, setOutcomes] = useState<NistOutcome[]>(NIST_CSF_OUTCOMES);
   const [decisions, setDecisions] = useState<Record<string, OutcomeDecision>>({});
   const [doraOverlayActive, setDoraOverlayActive] = useState(true);
   const [threatEntries, setThreatEntries] = useState<CisaKevEntry[]>([]);
@@ -29,18 +32,18 @@ export function App() {
   const [activeRiskDrawerOutcomeId, setActiveRiskDrawerOutcomeId] = useState<string | null>(null);
   const [topologyMapOpen, setTopologyMapOpen] = useState(false);
   const [cisoReportModalOpen, setCisoReportModalOpen] = useState(false);
+  const [addOutcomeModalOpen, setAddOutcomeModalOpen] = useState(false);
 
-  // Load initial decisions from LocalStorage or seed default state
+  // Load initial decisions & custom outcomes from LocalStorage
   useEffect(() => {
     try {
-      const saved = localStorage.getItem(LOCAL_STORAGE_KEY);
-      if (saved) {
-        setDecisions(JSON.parse(saved));
+      const savedDecisions = localStorage.getItem(LOCAL_STORAGE_KEY);
+      if (savedDecisions) {
+        setDecisions(JSON.parse(savedDecisions));
       } else {
-        // Default seed decisions
         const seed: Record<string, OutcomeDecision> = {
-          'PROTECT.PR.AA-01': {
-            outcomeId: 'PROTECT.PR.AA-01',
+          'PR.AA-01': {
+            outcomeId: 'PR.AA-01',
             status: 'SUPPORTED',
             lastUpdated: new Date().toISOString().split('T')[0],
             evidence: {
@@ -50,63 +53,43 @@ export function App() {
               reviewerName: 'Basil Tsalikidis (InfoSec Officer)',
               reviewDate: '2026-06-15',
               expiryDate: '2027-06-15',
-              rationale: 'MFA enforced across all enterprise VPN and NATO CIS gateways per ISO 27001 & DORA Article 9.'
-            }
-          },
-          'DETECT.DE.AE-01': {
-            outcomeId: 'DETECT.DE.AE-01',
-            status: 'SUPPORTED',
-            lastUpdated: new Date().toISOString().split('T')[0],
-            evidence: {
-              id: 'EVD-002',
-              documentName: 'SOC_SIEM_Monitoring_SOP.pdf',
-              referenceHash: '127e57f594582f349afbf4c8996fb92427ae41e4649b934ca495991b7852b855',
-              reviewerName: 'Basil Tsalikidis (InfoSec Officer)',
-              reviewDate: '2026-05-10',
-              expiryDate: '2027-05-10',
-              rationale: '24/7 SOC log ingestion and automated correlation against CISA KEV feeds.'
-            }
-          },
-          'RESPOND.RS.MA-01': {
-            outcomeId: 'RESPOND.RS.MA-01',
-            status: 'STALE',
-            lastUpdated: '2025-10-01',
-            riskContext: {
-              scenario: 'Incident response playbooks pending annual update for ransomware scenarios.',
-              likelihood: 'MEDIUM',
-              impact: 'HIGH',
-              treatment: 'MITIGATE',
-              targetDate: '2026-10-15'
+              rationale: 'MFA enforced across enterprise VPN and NATO CIS gateways per ISO 27001 & DORA Article 9.'
             }
           }
         };
         setDecisions(seed);
-        localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(seed));
+      }
+
+      const savedCustomOutcomes = localStorage.getItem(LOCAL_STORAGE_OUTCOMES_KEY);
+      if (savedCustomOutcomes) {
+        const parsedCustom: NistOutcome[] = JSON.parse(savedCustomOutcomes);
+        setOutcomes([...NIST_CSF_OUTCOMES, ...parsedCustom]);
       }
     } catch (e) {
-      console.error('Failed to load local decisions:', e);
+      console.error('Error reading localStorage:', e);
     }
   }, []);
 
-  // Sync CISA KEV feed
-  const handleSyncThreatFeed = async () => {
-    setThreatLoading(true);
-    const data = await fetchCisaKevThreatFeed();
-    setThreatEntries(data.entries);
-    setThreatIndex(data.index);
-    setThreatLoading(false);
-  };
-
+  // Fetch Live CISA Threats
   useEffect(() => {
     handleSyncThreatFeed();
   }, []);
 
-  // Update Status
+  const handleSyncThreatFeed = async () => {
+    setThreatLoading(true);
+    const result = await fetchCisaKevThreatFeed();
+    setThreatEntries(result.entries);
+    setThreatIndex(result.index);
+    setThreatLoading(false);
+  };
+
+  // Status updates
   const handleUpdateStatus = (outcomeId: string, status: MappingStatus) => {
     const updated = {
       ...decisions,
       [outcomeId]: {
-        ...(decisions[outcomeId] || { outcomeId }),
+        ...decisions[outcomeId],
+        outcomeId,
         status,
         lastUpdated: new Date().toISOString().split('T')[0]
       }
@@ -115,44 +98,45 @@ export function App() {
     localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(updated));
   };
 
-  // Save Evidence Record
-  const handleSaveEvidence = (evidence: EvidenceRecord) => {
-    if (!activeEvidenceModalOutcomeId) return;
+  // Add Custom Outcome
+  const handleAddCustomOutcome = (newOutcome: NistOutcome) => {
+    const updatedOutcomes = [...outcomes, newOutcome];
+    setOutcomes(updatedOutcomes);
 
-    const existing = decisions[activeEvidenceModalOutcomeId];
-    const updatedRecord: OutcomeDecision = {
-      outcomeId: activeEvidenceModalOutcomeId,
-      status: (existing?.status || 'SUPPORTED') as MappingStatus,
-      evidence,
-      riskContext: existing?.riskContext,
-      lastUpdated: new Date().toISOString().split('T')[0]
-    };
+    // Save custom additions
+    const customOnly = updatedOutcomes.filter(o => !NIST_CSF_OUTCOMES.some(defaultO => defaultO.id === o.id));
+    localStorage.setItem(LOCAL_STORAGE_OUTCOMES_KEY, JSON.stringify(customOnly));
 
+    setAddOutcomeModalOpen(false);
+  };
+
+  // Evidence recording
+  const handleSaveEvidence = (outcomeId: string, evidence: EvidenceRecord) => {
     const updated = {
       ...decisions,
-      [activeEvidenceModalOutcomeId]: updatedRecord
+      [outcomeId]: {
+        ...decisions[outcomeId],
+        outcomeId,
+        status: 'SUPPORTED' as MappingStatus,
+        evidence,
+        lastUpdated: new Date().toISOString().split('T')[0]
+      }
     };
     setDecisions(updated);
     localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(updated));
     setActiveEvidenceModalOutcomeId(null);
   };
 
-  // Save Risk Context
-  const handleSaveRisk = (riskContext: RiskContext) => {
-    if (!activeRiskDrawerOutcomeId) return;
-
-    const existing = decisions[activeRiskDrawerOutcomeId];
-    const updatedRecord: OutcomeDecision = {
-      outcomeId: activeRiskDrawerOutcomeId,
-      status: (existing?.status || 'UNSUPPORTED') as MappingStatus,
-      evidence: existing?.evidence,
-      riskContext,
-      lastUpdated: new Date().toISOString().split('T')[0]
-    };
-
+  // Risk context recording
+  const handleSaveRiskContext = (outcomeId: string, riskContext: RiskContext) => {
     const updated = {
       ...decisions,
-      [activeRiskDrawerOutcomeId]: updatedRecord
+      [outcomeId]: {
+        ...decisions[outcomeId],
+        outcomeId,
+        riskContext,
+        lastUpdated: new Date().toISOString().split('T')[0]
+      }
     };
     setDecisions(updated);
     localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(updated));
@@ -161,10 +145,15 @@ export function App() {
 
   // Export JSON
   const handleExportJson = () => {
-    const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(decisions, null, 2));
+    const exportData = {
+      outcomes,
+      decisions,
+      exportedAt: new Date().toISOString()
+    };
+    const dataStr = 'data:text/json;charset=utf-8,' + encodeURIComponent(JSON.stringify(exportData, null, 2));
     const downloadAnchor = document.createElement('a');
-    downloadAnchor.setAttribute("href", dataStr);
-    downloadAnchor.setAttribute("download", `csf_outcome_ledger_export_${new Date().toISOString().split('T')[0]}.json`);
+    downloadAnchor.setAttribute('href', dataStr);
+    downloadAnchor.setAttribute('download', `csf_outcome_ledger_export_${new Date().toISOString().split('T')[0]}.json`);
     document.body.appendChild(downloadAnchor);
     downloadAnchor.click();
     downloadAnchor.remove();
@@ -172,10 +161,21 @@ export function App() {
 
   // Import JSON
   const handleImportJson = (importedData: Record<string, any>) => {
-    setDecisions(importedData);
-    localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(importedData));
+    if (importedData.decisions) {
+      setDecisions(importedData.decisions);
+      localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(importedData.decisions));
+      if (importedData.outcomes && Array.isArray(importedData.outcomes)) {
+        setOutcomes(importedData.outcomes);
+      }
+    } else {
+      setDecisions(importedData);
+      localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(importedData));
+    }
     alert('Ledger dataset imported successfully! All control mapping decisions, evidence hashes, and risk contexts have been loaded.');
   };
+
+  const activeEvidenceOutcome = outcomes.find(o => o.id === activeEvidenceModalOutcomeId);
+  const activeRiskOutcome = outcomes.find(o => o.id === activeRiskDrawerOutcomeId);
 
   return (
     <div className="min-h-screen bg-[#faf9f6] flex flex-col font-sans">
@@ -203,63 +203,69 @@ export function App() {
 
         {/* NIST CSF 2.0 Implementation Tier & Profile Progression */}
         <ProfileTierWidget
-          outcomes={NIST_CSF_OUTCOMES}
+          outcomes={outcomes}
           decisions={decisions}
         />
 
         {/* NIST CSF 2.0 & SP 800-53 / DORA Mapping Ledger */}
         <LedgerGrid
-          outcomes={NIST_CSF_OUTCOMES}
+          outcomes={outcomes}
           decisions={decisions}
           doraOverlayActive={doraOverlayActive}
           onUpdateStatus={handleUpdateStatus}
           onOpenEvidenceModal={(id) => setActiveEvidenceModalOutcomeId(id)}
           onOpenRiskDrawer={(id) => setActiveRiskDrawerOutcomeId(id)}
+          onOpenAddOutcomeModal={() => setAddOutcomeModalOpen(true)}
         />
 
       </main>
 
       {/* Footer */}
-      <footer className="border-t border-zinc-200 bg-white py-4 text-xs text-zinc-500 text-center font-mono">
-        CSF Outcome Ledger • NIST CSF 2.0 / SP 800-53 / EU DORA & NIS2 • Local-First Architecture • Basil Tsalikidis
+      <footer className="bg-white border-t border-zinc-200 py-6 mt-12 text-center text-xs text-zinc-500 font-mono">
+        <p>CSF Outcome Ledger v1.0.0 — Open Source NIST CSF 2.0 & EU DORA Workbench</p>
+        <p className="mt-1 text-zinc-400">Created by Vasileios (Basil) Tsalikidis — MIT License</p>
       </footer>
 
-      {/* Evidence Modal */}
-      {activeEvidenceModalOutcomeId && (
+      {/* Modals & Drawers */}
+      {activeEvidenceOutcome && (
         <EvidenceModal
-          outcomeId={activeEvidenceModalOutcomeId}
-          existingEvidence={decisions[activeEvidenceModalOutcomeId]?.evidence}
-          onSave={handleSaveEvidence}
+          outcomeId={activeEvidenceOutcome.id}
+          existingEvidence={decisions[activeEvidenceOutcome.id]?.evidence}
+          onSave={(evd) => handleSaveEvidence(activeEvidenceOutcome.id, evd)}
           onClose={() => setActiveEvidenceModalOutcomeId(null)}
         />
       )}
 
-      {/* Risk Drawer */}
-      {activeRiskDrawerOutcomeId && (
+      {activeRiskOutcome && (
         <RiskDrawer
-          outcomeId={activeRiskDrawerOutcomeId}
-          existingRisk={decisions[activeRiskDrawerOutcomeId]?.riskContext}
-          onSave={handleSaveRisk}
+          outcomeId={activeRiskOutcome.id}
+          existingRisk={decisions[activeRiskOutcome.id]?.riskContext}
+          onSave={(risk) => handleSaveRiskContext(activeRiskOutcome.id, risk)}
           onClose={() => setActiveRiskDrawerOutcomeId(null)}
         />
       )}
 
-      {/* Topology Map */}
       {topologyMapOpen && (
         <TopologyMap
-          outcomes={NIST_CSF_OUTCOMES}
+          outcomes={outcomes}
           decisions={decisions}
           onClose={() => setTopologyMapOpen(false)}
         />
       )}
 
-      {/* CISO Board Report Modal */}
       {cisoReportModalOpen && (
         <CisoBoardReportModal
-          outcomes={NIST_CSF_OUTCOMES}
+          outcomes={outcomes}
           decisions={decisions}
           threatIndex={threatIndex}
           onClose={() => setCisoReportModalOpen(false)}
+        />
+      )}
+
+      {addOutcomeModalOpen && (
+        <AddOutcomeModal
+          onAdd={handleAddCustomOutcome}
+          onClose={() => setAddOutcomeModalOpen(false)}
         />
       )}
 
