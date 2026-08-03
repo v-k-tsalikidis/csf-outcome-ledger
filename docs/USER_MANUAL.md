@@ -1,12 +1,12 @@
-# CSF Outcome Ledger - Complete Step-by-Step User Manual
+# CSF Outcome Ledger - Step-by-Step User Manual
 
-> **Beginner-Friendly Guide for Auditors, CISOs, IT Managers, and Security Practitioners**
+> Beginner-Friendly Guide for Auditors, CISOs, IT Managers, and Security Practitioners
 
 Welcome to **CSF Outcome Ledger**. This manual provides a step-by-step walkthrough for evaluating your organization’s cybersecurity readiness using **NIST CSF 2.0, NIST SP 800-53 Rev. 5, and EU DORA/NIS2** standards—without needing complex enterprise software or uploading private files to the internet.
 
 ---
 
-## 🏁 Step 1: Opening the Application
+## Step 1: Opening the Application
 
 1. Open your web browser (Chrome, Edge, Safari, or Firefox).
 2. Navigate to: **`http://localhost:5173`**
@@ -14,16 +14,16 @@ Welcome to **CSF Outcome Ledger**. This manual provides a step-by-step walkthrou
 
 ---
 
-## 🗺️ Step 2: Understanding the Screen Layout
+## Step 2: Understanding the Screen Layout
 
 The dashboard is structured into 4 main sections from top to bottom:
 
 1. **Top Bar (Header)**:
    - **Logo & Title**: Indicates the application version (`v1.0.0`).
-   - **Sector Threat Index (Pill)**: Shows real-time threat levels based on live vulnerability feeds.
-   - **EU DORA / NIS2 Overlay (Button)**: Click to reveal European regulatory requirements alongside NIST controls.
-   - **Topology Map (Button)**: Opens a visual diagram showing how threat feeds, controls, and evidence connect.
-   - **CISO Board Report (Button)**: Generates a 1-click printable summary for executive management.
+   - **Sector Threat Index**: Shows real-time threat levels based on live vulnerability feeds.
+   - **EU DORA / NIS2 Overlay**: Click to reveal European regulatory requirements alongside NIST controls.
+   - **Topology Map**: Opens a visual diagram showing how threat feeds, controls, and evidence connect.
+   - **CISO Board Report**: Generates a 1-click printable summary for executive management.
    - **Upload / Download Icons**: For batch importing or saving your ledger progress as a JSON file.
 
 2. **Live CISA Threat Feed (Top Panel)**:
@@ -41,7 +41,7 @@ The dashboard is structured into 4 main sections from top to bottom:
 
 ---
 
-## 📝 Step 3: Performing a Security Audit (Step-by-Step)
+## Step 3: Performing a Security Audit (Step-by-Step)
 
 For every outcome in the Main Grid (e.g. `PROTECT.PR.AA-01` - Access Control & MFA):
 
@@ -74,20 +74,20 @@ Click the status dropdown on the right side of the outcome card:
 
 ---
 
-## 📊 Step 4: Generating Executive Reports & Saving Progress
+## Step 4: Generating Executive Reports & Saving Progress
 
 ### 4.1 Exporting the CISO Board Report
 1. Click the **`CISO Board Report`** button in the top header.
 2. A clean executive summary modal opens showing your overall threat index, compliance match percentage, Current vs. Target Profile metrics, and full control status matrix.
-3. Click **Print / Export PDF** to print or save a PDF report for your Chief Information Security Officer (CISO) or Board of Directors!
+3. Click **Print / Export PDF** to print or save a PDF report for your Chief Information Security Officer (CISO) or Board of Directors.
 
 ### 4.2 Saving & Reloading Your Work (Data Import / Export)
 - **Save Backup**: Click the **Download (Export JSON)** icon in the top header to save `csf_outcome_ledger_export.json` to your computer.
-- **Reload Backup**: Click the **Upload (Import JSON)** icon, select your saved `.json` file, and all your decisions, SHA-256 hashes, and risk contexts will load instantly in 1 second!
+- **Reload Backup**: Click the **Upload (Import JSON)** icon, select your saved `.json` file, and all your decisions, SHA-256 hashes, and risk contexts will load instantly in 1 second.
 
 ---
 
-## 💡 Quick Tips for Beginners
+## Technical Tips
 
 - **Zero Cloud Risk**: All your data stays 100% inside your web browser. You can safely use this tool offline.
-- **Tier Progression**: As you add supported outcomes and SHA-256 evidence, watch your **Current Profile Tier** automatically upgrade from *Tier 1 Partial* to *Tier 3 Repeatable*!
+- **Tier Progression**: As you add supported outcomes and SHA-256 evidence, watch your **Current Profile Tier** automatically upgrade from *Tier 1 Partial* to *Tier 3 Repeatable*.
