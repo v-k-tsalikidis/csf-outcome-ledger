@@ -1,52 +1,78 @@
 # CSF Outcome Ledger
 
-> Research-stage, independent portfolio project. No implementation or compliance claim is made yet.
+> **Local-First NIST CSF 2.0 & EU DORA Workbench with Live CISA Threat Intelligence & SHA-256 Provenance**
 
-CSF Outcome Ledger is a proposed local-first workspace for recording why a security activity or evidence artifact supports a NIST Cybersecurity Framework 2.0 outcome.
+![CSF Outcome Ledger Banner](docs/csf_outcome_ledger_banner.png)
 
-The project is deliberately not another maturity-score dashboard. Its primary artifact is a human-approved mapping decision with source provenance, rationale, review history, and freshness state. It will keep evidence metadata in the browser and will not require source documents to be uploaded to a service.
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
+[![NIST CSF 2.0](https://img.shields.io/badge/NIST%20CSF-2.0-teal)](https://www.nist.gov/cyberframework)
+[![SP 800-53 Rev. 5](https://img.shields.io/badge/NIST-SP%20800--53%20Rev.%205-indigo)](https://csrc.nist.gov/publications/detail/sp/800-53/rev-5/final)
+[![EU DORA & NIS2](https://img.shields.io/badge/EU-DORA%20%2F%20NIS2-amber)](https://eur-lex.europa.eu/)
 
-## Current Status
+CSF Outcome Ledger is an independent, local-first web application designed for recording, mapping, and validating cybersecurity controls against **NIST CSF 2.0, NIST SP 800-53 Rev. 5, ISO 27001:2022, DORA (Articles 5-14), and NIS2 (Article 21)**.
 
-**Research**
+Unlike typical GRC platforms that collapse security posture into arbitrary percentage scores, CSF Outcome Ledger focuses on **audit provenance, human mapping rationale, SHA-256 evidence hashing, and live threat feed correlation**.
 
-The problem statement, comparable solutions, methodology boundaries, privacy posture, and release gates are being defined before implementation.
+---
 
-## Proposed Core Workflow
+## 🌟 Key Features
 
-1. Define the assessment scope and select relevant CSF 2.0 outcomes.
-2. Record a security activity, claim, or evidence reference.
-3. Review candidate outcomes and make an explicit mapping decision.
-4. Record the relationship, rationale, reviewer, and review date.
-5. Distinguish supported, unsupported, stale, unresolved, and out-of-scope records.
-6. Export the decision ledger and Current/Target Profile views.
+- **NIST CSF 2.0 ➔ SP 800-53 & ISO 27001 Mapping:** Built-in mapping database linking high-level outcomes (`PR.AA-01`, `DE.AE-01`, `PR.DS-01`) to technical control families (`AC-2`, `IA-2`, `SC-8`, `AU-2`).
+- **🇪🇺 EU DORA & NIS2 Regulatory Overlays:** Toggleable regulatory mapping for European enterprise compliance (Financial Services & Critical Infrastructure).
+- **📡 Live CISA Sector Threat Feed (KEV API):** Real-time fetcher connecting CISA Known Exploited Vulnerabilities to security control requirements.
+- **🔐 Client-Side SHA-256 Evidence Hasher:** Local Web Crypto hashing of audit evidence files. Zero cloud upload—100% data sovereignty and cryptographic auditability.
+- **🕸️ Interactive Dependency Topology Map:** Visual node graph displaying end-to-end traceability (`Live Threat ➔ NIST Outcome ➔ SP 800-53 Control ➔ Risk Scenario ➔ SHA-256 Evidence`).
+- **📊 One-Click CISO Executive Board Report:** Export print-ready executive summaries for CISO and Board presentations.
+- **🎨 Premium Minimalist Light Aesthetic:** Gallery/editor design system (`#faf9f6` canvas, Inter & JetBrains Mono typography, muted status badges).
 
-A schema-valid fictional record is available at
-[`examples/synthetic-workspace.json`](examples/synthetic-workspace.json).
+---
 
-## Design Commitments
+## 🚀 Quick Start
 
-- Local-first and usable without an account.
-- No source-document upload or cloud processing in the baseline release.
-- No mandatory AI and no opaque automated judgment.
-- No aggregate "compliance percentage."
-- Versioned CSF source data and reproducible mapping records.
-- Human-readable and machine-readable exports.
-- WCAG-informed, keyboard-accessible, responsive interface.
-- Public and synthetic demonstration data only.
+### Prerequisites
+- Node.js 18+ & npm
 
-## Documentation
+### Installation & Local Run
 
-- [Differentiation brief](docs/DIFFERENTIATION_BRIEF.md)
-- [Research sources](docs/RESEARCH_SOURCES.md)
-- [Methodology specification](docs/METHODOLOGY_SPEC.md)
-- [Mapping examples](docs/MAPPING_EXAMPLES.md)
-- [Source-data policy](docs/SOURCE_DATA_POLICY.md)
-- [Architecture](docs/ARCHITECTURE.md)
-- [Release gate](docs/RELEASE_GATE.md)
+```bash
+# Clone the repository
+git clone https://github.com/v-k-tsalikidis/csf-outcome-ledger.git
 
-## Independence And Use
+# Navigate into project directory
+cd csf-outcome-ledger
 
-This is an independent educational and portfolio project. It is not affiliated with, endorsed by, or connected to NIST, NATO, the European Union, the Hellenic Army, or any employer. It is not an audit, certification, legal opinion, or guarantee of conformity.
+# Install dependencies
+npm install
 
-Only public, synthetic, demo, or intentionally sanitized data will be committed to this repository.
+# Run dev server
+npm run dev
+```
+
+Open [http://localhost:5173](http://localhost:5173) in your browser.
+
+---
+
+## 🛡️ Architecture & Data Sovereignty
+
+CSF Outcome Ledger is built **local-first**:
+1. All decision records, evidence metadata, and risk entries are stored locally in the browser (`LocalStorage` / `IndexedDB`).
+2. Evidence files are hashed client-side using `window.crypto.subtle.digest('SHA-256')`. Source document contents are never transmitted across the network.
+3. Network calls are restricted to fetching open threat feeds from CISA (`cisa.gov`).
+
+---
+
+## 📄 Documentation & Guides
+
+- [Troubleshooting & Execution Guide](docs/TROUBLESHOOTING.md)
+- [LinkedIn Launch Presentation](docs/LINKEDIN_LAUNCH_POST.md)
+- [Differentiation Brief](docs/DIFFERENTIATION_BRIEF.md)
+- [Methodology Specification](docs/METHODOLOGY_SPEC.md)
+- [Architecture & Design Tokens](docs/ARCHITECTURE.md)
+
+---
+
+## ⚖️ License & Disclaimer
+
+Independent educational and portfolio project created by Vasileios (Basil) Tsalikidis. Not affiliated with or endorsed by NIST, CISA, NATO, the European Union, or any commercial entity.
+
+Licensed under the MIT License.
