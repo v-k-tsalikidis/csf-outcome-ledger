@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { X, AlertTriangle, ShieldAlert } from 'lucide-react';
+import { X, ShieldAlert } from 'lucide-react';
 import { RiskContext, RiskLevel } from '../types/ledger';
 
 interface RiskDrawerProps {
@@ -17,12 +17,18 @@ export const RiskDrawer: React.FC<RiskDrawerProps> = ({
 }) => {
   const [scenario, setScenario] = useState(
     existingRisk?.scenario ||
-    `Risk scenario regarding ${outcomeId}: Unauthorized access or operational disruption due to missing/stale control enforcement.`
+      `Risk scenario regarding ${outcomeId}: Unauthorized access or operational disruption due to missing/stale control enforcement.`
   );
-  const [likelihood, setLikelihood] = useState<RiskLevel>(existingRisk?.likelihood || 'HIGH');
+  const [likelihood, setLikelihood] = useState<RiskLevel>(
+    existingRisk?.likelihood || 'HIGH'
+  );
   const [impact, setImpact] = useState<RiskLevel>(existingRisk?.impact || 'CRITICAL');
-  const [treatment, setTreatment] = useState<RiskContext['treatment']>(existingRisk?.treatment || 'MITIGATE');
-  const [targetDate, setTargetDate] = useState(existingRisk?.targetDate || '2026-11-30');
+  const [treatment, setTreatment] = useState<RiskContext['treatment']>(
+    existingRisk?.treatment || 'MITIGATE'
+  );
+  const [targetDate, setTargetDate] = useState(
+    existingRisk?.targetDate || '2026-11-30'
+  );
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -38,7 +44,6 @@ export const RiskDrawer: React.FC<RiskDrawerProps> = ({
   return (
     <div className="fixed inset-0 z-50 flex justify-end bg-zinc-900/30 backdrop-blur-xs">
       <div className="bg-white border-l border-zinc-200 max-w-md w-full h-full p-6 shadow-2xl overflow-y-auto text-left flex flex-col justify-between">
-        
         <div>
           <div className="flex items-center justify-between pb-4 border-b border-zinc-200 mb-5">
             <div className="flex items-center space-x-2">
@@ -56,7 +61,6 @@ export const RiskDrawer: React.FC<RiskDrawerProps> = ({
           </div>
 
           <form id="riskForm" onSubmit={handleSubmit} className="space-y-4">
-            
             {/* Risk Scenario */}
             <div>
               <label className="block text-xs font-medium text-zinc-700 mb-1">
@@ -142,7 +146,6 @@ export const RiskDrawer: React.FC<RiskDrawerProps> = ({
                 required
               />
             </div>
-
           </form>
         </div>
 
@@ -162,7 +165,6 @@ export const RiskDrawer: React.FC<RiskDrawerProps> = ({
             Save Risk Assessment
           </button>
         </div>
-
       </div>
     </div>
   );

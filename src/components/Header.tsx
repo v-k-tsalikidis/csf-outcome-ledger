@@ -1,5 +1,13 @@
 import React, { useRef } from 'react';
-import { ShieldCheck, FileText, Download, Upload, Activity, Lock, Globe, Sparkles } from 'lucide-react';
+import {
+  ShieldCheck,
+  FileText,
+  Download,
+  Upload,
+  Activity,
+  Globe,
+  Sparkles
+} from 'lucide-react';
 import { ThreatIndex } from '../types/ledger';
 
 interface HeaderProps {
@@ -9,7 +17,7 @@ interface HeaderProps {
   onOpenReportModal: () => void;
   onOpenTopologyMap: () => void;
   onExportJson: () => void;
-  onImportJson: (importedData: Record<string, any>) => void;
+  onImportJson: (importedData: Record<string, unknown>) => void;
 }
 
 export const Header: React.FC<HeaderProps> = ({
@@ -32,8 +40,10 @@ export const Header: React.FC<HeaderProps> = ({
       try {
         const parsed = JSON.parse(event.target?.result as string);
         onImportJson(parsed);
-      } catch (err) {
-        alert('Invalid JSON file format. Please upload a valid CSF Outcome Ledger export.');
+      } catch {
+        alert(
+          'Invalid JSON file format. Please upload a valid CSF Outcome Ledger export.'
+        );
       }
     };
     reader.readAsText(file);
@@ -43,7 +53,6 @@ export const Header: React.FC<HeaderProps> = ({
     <header className="bg-white border-b border-zinc-200 sticky top-0 z-30 shadow-xs">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
-          
           {/* Logo & Title */}
           <div className="flex items-center space-x-3">
             <div className="w-9 h-9 rounded-lg bg-teal-700 flex items-center justify-center text-white shadow-xs">
@@ -66,17 +75,29 @@ export const Header: React.FC<HeaderProps> = ({
 
           {/* Sector Threat Index & EU Regulation Toggle */}
           <div className="flex items-center space-x-3">
-            
             {/* Live Threat Pill */}
-            <div className="hidden md:flex items-center gap-2 px-3 py-1.5 bg-rose-50/80 border border-rose-200/80 rounded-md">
-              <Activity className="w-4 h-4 text-rose-600 animate-pulse" />
+            <div className="hidden md:flex items-center gap-2 px-3 py-1.5 bg-zinc-50 border border-zinc-200 rounded-md">
+              <Activity className="w-4 h-4 text-zinc-500" />
               <div className="text-left">
-                <div className="text-[10px] uppercase tracking-wider font-semibold text-rose-700">
-                  Sector Threat Index
+                <div className="text-[10px] uppercase tracking-wider font-semibold text-zinc-600">
+                  CISA KEV catalogue
                 </div>
-                <div className="text-xs font-mono font-semibold text-rose-900 flex items-center gap-1.5">
-                  <span>{threatIndex.overallLevel} ({threatIndex.activeSectorKevs} Active KEVs)</span>
-                  <span className="text-[10px] text-rose-600 font-normal">[{threatIndex.lastSync}]</span>
+                <div className="text-xs font-mono font-semibold text-zinc-900 flex items-center gap-1.5">
+                  <span>
+                    {threatIndex.catalogueSize !== null
+                      ? `${threatIndex.catalogueSize.toLocaleString()} entries`
+                      : 'offline sample'}
+                  </span>
+                  <span className="text-[10px] text-zinc-500 font-normal">
+                    [
+                    {threatIndex.retrievedAt
+                      ? new Date(threatIndex.retrievedAt).toLocaleTimeString([], {
+                          hour: '2-digit',
+                          minute: '2-digit'
+                        })
+                      : 'not retrieved'}
+                    ]
+                  </span>
                 </div>
               </div>
             </div>
@@ -91,7 +112,9 @@ export const Header: React.FC<HeaderProps> = ({
               }`}
               title="Toggle EU DORA & NIS2 Regulatory Compliance Mapping"
             >
-              <Globe className={`w-3.5 h-3.5 ${doraOverlayActive ? 'text-teal-600' : 'text-zinc-400'}`} />
+              <Globe
+                className={`w-3.5 h-3.5 ${doraOverlayActive ? 'text-teal-600' : 'text-zinc-400'}`}
+              />
               <span>EU DORA / NIS2 Overlay</span>
               {doraOverlayActive && (
                 <span className="w-1.5 h-1.5 rounded-full bg-teal-600 inline-block"></span>
@@ -141,7 +164,6 @@ export const Header: React.FC<HeaderProps> = ({
               <Download className="w-4 h-4" />
             </button>
           </div>
-
         </div>
       </div>
     </header>

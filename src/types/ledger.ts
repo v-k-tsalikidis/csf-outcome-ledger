@@ -1,4 +1,5 @@
-export type FunctionCategory = 'IDENTIFY' | 'PROTECT' | 'DETECT' | 'RESPOND' | 'RECOVER' | 'GOVERN';
+export type FunctionCategory =
+  'IDENTIFY' | 'PROTECT' | 'DETECT' | 'RESPOND' | 'RECOVER' | 'GOVERN';
 
 export type MappingStatus = 'SUPPORTED' | 'UNSUPPORTED' | 'STALE' | 'OUT_OF_SCOPE';
 
@@ -62,6 +63,15 @@ export interface OutcomeDecision {
   lastUpdated: string;
 }
 
+/**
+ * One record of the CISA Known Exploited Vulnerabilities catalogue.
+ *
+ * These are exactly the fields CISA publishes. Nothing is added here.
+ * A previous version of this file carried `sectorImpact` and `severity`,
+ * which CISA does not publish and which this application was inventing;
+ * presenting derived values as catalogue data is the kind of unsupported
+ * claim this whole tool exists to argue against.
+ */
 export interface CisaKevEntry {
   cveID: string;
   vendorProject: string;
@@ -72,12 +82,29 @@ export interface CisaKevEntry {
   requiredAction: string;
   dueDate: string;
   knownRansomwareCampaignUse: string;
-  sectorImpact?: string;
-  severity: RiskLevel;
+  cwes?: string[];
+  notes?: string;
 }
 
+/** Where the displayed entries actually came from. */
+export type ThreatFeedSource = 'live' | 'offline-sample';
+
+/**
+ * Counts derived from the retrieved entries, and the provenance of those
+ * entries. There is deliberately no overall threat level: CISA does not
+ * publish one, and inventing a headline severity is the dashboard habit
+ * this project rejects.
+ */
 export interface ThreatIndex {
-  overallLevel: RiskLevel;
-  activeSectorKevs: number;
-  lastSync: string;
+  source: ThreatFeedSource;
+  /** Entries shown that CISA links to a known ransomware campaign. */
+  ransomwareLinked: number;
+  /** Entries shown whose CISA remediation due date has passed. */
+  pastDue: number;
+  /** Entries shown in the panel. */
+  shown: number;
+  /** Size of the whole catalogue; null when the live feed was unavailable. */
+  catalogueSize: number | null;
+  /** ISO timestamp of a successful retrieval; null for the offline sample. */
+  retrievedAt: string | null;
 }

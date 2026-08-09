@@ -18,12 +18,18 @@ export const EvidenceModal: React.FC<EvidenceModalProps> = ({
 }) => {
   const [docName, setDocName] = useState(existingEvidence?.documentName || '');
   const [hash, setHash] = useState(existingEvidence?.referenceHash || '');
-  const [reviewer, setReviewer] = useState(existingEvidence?.reviewerName || 'Basil Tsalikidis (InfoSec Officer)');
-  const [reviewDate, setReviewDate] = useState(existingEvidence?.reviewDate || new Date().toISOString().split('T')[0]);
-  const [expiryDate, setExpiryDate] = useState(existingEvidence?.expiryDate || '2027-08-01');
+  const [reviewer, setReviewer] = useState(
+    existingEvidence?.reviewerName || 'Basil Tsalikidis (InfoSec Officer)'
+  );
+  const [reviewDate] = useState(
+    existingEvidence?.reviewDate || new Date().toISOString().split('T')[0]
+  );
+  const [expiryDate, setExpiryDate] = useState(
+    existingEvidence?.expiryDate || '2027-08-01'
+  );
   const [rationale, setRationale] = useState(
     existingEvidence?.rationale ||
-    'Evidence reviewed and mapped against NIST CSF 2.0 requirements with strict audit provenance.'
+      'Evidence reviewed and mapped against NIST CSF 2.0 requirements with strict audit provenance.'
   );
 
   const [hashingFile, setHashingFile] = useState(false);
@@ -64,7 +70,6 @@ export const EvidenceModal: React.FC<EvidenceModalProps> = ({
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-zinc-900/40 backdrop-blur-xs p-4">
       <div className="bg-white border border-zinc-200 rounded-lg max-w-lg w-full p-6 shadow-xl relative text-left">
-        
         <button
           onClick={onClose}
           className="absolute top-4 right-4 text-zinc-400 hover:text-zinc-700 transition-colors"
@@ -80,16 +85,18 @@ export const EvidenceModal: React.FC<EvidenceModalProps> = ({
             <h3 className="text-base font-semibold text-zinc-900">
               Evidence Provenance & SHA-256 Hasher
             </h3>
-            <span className="font-mono text-xs text-teal-700">Mapping to {outcomeId}</span>
+            <span className="font-mono text-xs text-teal-700">
+              Mapping to {outcomeId}
+            </span>
           </div>
         </div>
 
         <p className="text-xs text-zinc-500 mb-5">
-          Compute local SHA-256 file hashes for cryptographic audit verification. Your source documents remain 100% local on your device.
+          Compute local SHA-256 file hashes for cryptographic audit verification. Your
+          source documents remain 100% local on your device.
         </p>
 
         <form onSubmit={handleSubmit} className="space-y-4">
-          
           {/* File Picker or Input */}
           <div>
             <label className="block text-xs font-medium text-zinc-700 mb-1">
@@ -192,7 +199,6 @@ export const EvidenceModal: React.FC<EvidenceModalProps> = ({
               <span>Record Decision</span>
             </button>
           </div>
-
         </form>
       </div>
     </div>

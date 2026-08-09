@@ -1,94 +1,170 @@
-import { CisaKevEntry, ThreatIndex } from '../types/ledger';
+import { CisaKevEntry, ThreatIndex, ThreatFeedSource } from '../types/ledger';
 
-const CISA_KEV_FEED_URL = 'https://www.cisa.gov/sites/default/files/feeds/known_exploited_vulnerabilities.json';
+const CISA_KEV_FEED_URL =
+  'https://www.cisa.gov/sites/default/files/feeds/known_exploited_vulnerabilities.json';
 
-const FALLBACK_KEV_ENTRIES: CisaKevEntry[] = [
+const FEED_TIMEOUT_MS = 8000;
+const ENTRIES_SHOWN = 3;
+
+/**
+ * Three real records from the CISA catalogue, kept verbatim so the panel
+ * has something truthful to show when the feed cannot be reached — the
+ * browser blocking it on CORS, or no network at all.
+ *
+ * These are a dated snapshot, not live data, and the UI says so. They are
+ * never presented as a current feed. Refresh them by copying records from
+ * the catalogue rather than by writing plausible-looking ones.
+ */
+const OFFLINE_SAMPLE: CisaKevEntry[] = [
   {
-    cveID: 'CVE-2026-21887',
-    vendorProject: 'Palo Alto Networks',
-    product: 'PAN-OS & GlobalProtect',
-    vulnerabilityName: 'Authentication Bypass & Command Injection',
-    dateAdded: '2026-03-14',
-    shortDescription: 'Unauthenticated remote code execution vulnerability exploited in active Zero-Day campaigns targeting defense and enterprise networks.',
-    requiredAction: 'Apply hotfix per vendor advisory or restrict management interface access immediately.',
-    dueDate: '2026-03-21',
-    knownRansomwareCampaignUse: 'Known',
-    sectorImpact: 'Defense, Government & Energy Sector',
-    severity: 'CRITICAL'
+    cveID: 'CVE-2026-8037',
+    vendorProject: 'Progress',
+    product: 'LoadMaster',
+    vulnerabilityName: 'Progress LoadMaster Command Injection Vulnerability',
+    dateAdded: '2026-08-07',
+    shortDescription:
+      'Progress LoadMaster contains a command injection vulnerability that allows an un-authenticated attacker to execute arbitrary commands on the LoadMaster appliance by exploiting unsanitized input in multiple command endpoints.',
+    requiredAction:
+      'Apply mitigations in accordance with vendor instructions, or discontinue use of the product if mitigations are unavailable.',
+    dueDate: '2026-08-10',
+    knownRansomwareCampaignUse: 'Unknown',
+    cwes: ['CWE-77']
   },
   {
-    cveID: 'CVE-2025-1482',
-    vendorProject: 'Cisco Systems',
-    product: 'IOS XE & Secure Firewall',
-    vulnerabilityName: 'Privilege Escalation & Session Hijack',
-    dateAdded: '2025-11-04',
-    shortDescription: 'Flaw in web administrative interface allows remote attackers to obtain administrative privileges on affected systems.',
-    requiredAction: 'Upgrade to fixed release or disable HTTP/HTTPS server feature.',
-    dueDate: '2025-11-18',
-    knownRansomwareCampaignUse: 'Known',
-    sectorImpact: 'Financial Services & Telecommunications',
-    severity: 'HIGH'
+    cveID: 'CVE-2026-63077',
+    vendorProject: 'JetBrains',
+    product: 'TeamCity',
+    vulnerabilityName:
+      'JetBrains TeamCity Deserialization of Untrusted Data Vulnerability',
+    dateAdded: '2026-08-05',
+    shortDescription:
+      'JetBrains TeamCity contains a deserialization of untrusted data vulnerability that could allow unauthenticated remote code execution via the agent polling protocol.',
+    requiredAction:
+      'Apply mitigations in accordance with vendor instructions, or discontinue use of the product if mitigations are unavailable.',
+    dueDate: '2026-08-08',
+    knownRansomwareCampaignUse: 'Unknown',
+    cwes: ['CWE-502']
   },
   {
-    cveID: 'CVE-2025-0108',
-    vendorProject: 'Fortinet',
-    product: 'FortiGate / FortiOS',
-    vulnerabilityName: 'Format String Vulnerability in SSL-VPN',
-    dateAdded: '2025-08-19',
-    shortDescription: 'Format string vulnerability allows unauthenticated attacker to execute arbitrary code via specially crafted requests.',
-    requiredAction: 'Apply vendor patch or disable SSL-VPN functionality.',
-    dueDate: '2025-09-02',
-    knownRansomwareCampaignUse: 'Known',
-    sectorImpact: 'Cross-Sector / NATO Infrastructure',
-    severity: 'CRITICAL'
+    cveID: 'CVE-2026-18556',
+    vendorProject: 'N-able',
+    product: 'N-central',
+    vulnerabilityName:
+      'N-able N-central Authentication Bypass Using an Alternate Path or Channel Vulnerability',
+    dateAdded: '2026-08-04',
+    shortDescription:
+      'N-able N-central contains an authentication bypass using an alternate path or channel that allows for authentication bypass.',
+    requiredAction:
+      'Apply mitigations in accordance with vendor instructions, or discontinue use of the product if mitigations are unavailable.',
+    dueDate: '2026-08-07',
+    knownRansomwareCampaignUse: 'Unknown',
+    cwes: ['CWE-288']
   }
 ];
 
-export async function fetchCisaKevThreatFeed(): Promise<{ entries: CisaKevEntry[]; index: ThreatIndex }> {
+/** The snapshot date of OFFLINE_SAMPLE, shown so nobody mistakes it for live data. */
+export const OFFLINE_SAMPLE_DATE = '2026-08-07';
+
+/** Keep only the fields CISA publishes, and drop anything malformed. */
+function normalise(raw: unknown): CisaKevEntry | null {
+  if (typeof raw !== 'object' || raw === null) return null;
+  const v = raw as Record<string, unknown>;
+  const required = [
+    'cveID',
+    'vendorProject',
+    'product',
+    'vulnerabilityName',
+    'dateAdded',
+    'shortDescription',
+    'requiredAction',
+    'dueDate',
+    'knownRansomwareCampaignUse'
+  ] as const;
+  for (const key of required) {
+    if (typeof v[key] !== 'string') return null;
+  }
+  return {
+    cveID: v.cveID as string,
+    vendorProject: v.vendorProject as string,
+    product: v.product as string,
+    vulnerabilityName: v.vulnerabilityName as string,
+    dateAdded: v.dateAdded as string,
+    shortDescription: v.shortDescription as string,
+    requiredAction: v.requiredAction as string,
+    dueDate: v.dueDate as string,
+    knownRansomwareCampaignUse: v.knownRansomwareCampaignUse as string,
+    cwes: Array.isArray(v.cwes) ? (v.cwes as string[]) : undefined,
+    notes: typeof v.notes === 'string' ? v.notes : undefined
+  };
+}
+
+/**
+ * Counts that can be justified from the entries themselves.
+ *
+ * `pastDue` compares the CISA remediation due date against today. It says
+ * that the deadline has passed, not that any particular organisation is
+ * non-compliant, which the catalogue cannot know.
+ */
+export function summarise(
+  entries: CisaKevEntry[],
+  source: ThreatFeedSource,
+  catalogueSize: number | null,
+  retrievedAt: string | null
+): ThreatIndex {
+  const today = new Date().toISOString().slice(0, 10);
+  return {
+    source,
+    ransomwareLinked: entries.filter(
+      (e) => e.knownRansomwareCampaignUse.toLowerCase() === 'known'
+    ).length,
+    pastDue: entries.filter((e) => e.dueDate && e.dueDate < today).length,
+    shown: entries.length,
+    catalogueSize,
+    retrievedAt
+  };
+}
+
+export async function fetchCisaKevThreatFeed(): Promise<{
+  entries: CisaKevEntry[];
+  index: ThreatIndex;
+}> {
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), FEED_TIMEOUT_MS);
+
   try {
-    const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 4000);
-
     const response = await fetch(CISA_KEV_FEED_URL, { signal: controller.signal });
-    clearTimeout(timeoutId);
+    if (!response.ok) throw new Error(`HTTP ${response.status}`);
 
-    if (!response.ok) throw new Error(`HTTP Error ${response.status}`);
+    const data: unknown = await response.json();
+    const catalogue =
+      typeof data === 'object' && data !== null
+        ? (((data as Record<string, unknown>).vulnerabilities as unknown[]) ?? [])
+        : [];
 
-    const data = await response.json();
-    const rawVulnerabilities = data.vulnerabilities || [];
+    const entries = catalogue
+      .map(normalise)
+      .filter((e): e is CisaKevEntry => e !== null)
+      .sort((a, b) => b.dateAdded.localeCompare(a.dateAdded))
+      .slice(0, ENTRIES_SHOWN);
 
-    // Filter or map vulnerabilities to latest 2025/2026 dates
-    const entries: CisaKevEntry[] = rawVulnerabilities.slice(0, 8).map((v: any) => ({
-      cveID: v.cveID || 'CVE-2026-9999',
-      vendorProject: v.vendorProject || 'Vendor',
-      product: v.product || 'Product',
-      vulnerabilityName: v.vulnerabilityName || 'Known Exploited Bug',
-      dateAdded: v.dateAdded || '2026-02-10',
-      shortDescription: v.shortDescription || 'Exploited in active cyber operations.',
-      requiredAction: v.requiredAction || 'Remediate immediately.',
-      dueDate: v.dueDate || 'Immediate',
-      knownRansomwareCampaignUse: v.knownRansomwareCampaignUse || 'Known',
-      sectorImpact: 'Critical Infrastructure / Financial Services',
-      severity: v.knownRansomwareCampaignUse === 'Known' ? 'CRITICAL' : 'HIGH'
-    }));
+    if (entries.length === 0) throw new Error('feed contained no usable records');
 
     return {
       entries,
-      index: {
-        overallLevel: 'CRITICAL',
-        activeSectorKevs: rawVulnerabilities.length,
-        lastSync: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
-      }
+      index: summarise(entries, 'live', catalogue.length, new Date().toISOString())
     };
   } catch (error) {
-    console.warn('Using CISA KEV verified 2025/2026 fallback dataset:', error);
+    // The panel states that this is a dated sample, so failing over is
+    // honest rather than silent.
+    console.warn(
+      'CISA KEV feed unavailable, showing the offline sample instead:',
+      error
+    );
     return {
-      entries: FALLBACK_KEV_ENTRIES,
-      index: {
-        overallLevel: 'CRITICAL',
-        activeSectorKevs: FALLBACK_KEV_ENTRIES.length,
-        lastSync: 'Live 2026 Feed Verified'
-      }
+      entries: OFFLINE_SAMPLE,
+      index: summarise(OFFLINE_SAMPLE, 'offline-sample', null, null)
     };
+  } finally {
+    clearTimeout(timeout);
   }
 }

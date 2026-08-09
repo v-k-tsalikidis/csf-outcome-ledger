@@ -1,5 +1,5 @@
 import React from 'react';
-import { X, Network, ShieldCheck, AlertOctagon, FileCheck, Layers } from 'lucide-react';
+import { X, Network, AlertOctagon, FileCheck } from 'lucide-react';
 import { NistOutcome, OutcomeDecision } from '../types/ledger';
 
 interface TopologyMapProps {
@@ -10,13 +10,12 @@ interface TopologyMapProps {
 
 export const TopologyMap: React.FC<TopologyMapProps> = ({
   outcomes,
-  decisions,
+  decisions: _decisions,
   onClose
 }) => {
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-zinc-900/50 backdrop-blur-xs p-4">
       <div className="bg-white border border-zinc-200 rounded-lg max-w-4xl w-full h-[80vh] p-6 shadow-2xl relative text-left flex flex-col justify-between">
-        
         {/* Header */}
         <div className="flex items-center justify-between pb-4 border-b border-zinc-200">
           <div className="flex items-center space-x-2.5">
@@ -28,7 +27,8 @@ export const TopologyMap: React.FC<TopologyMapProps> = ({
                 Interactive Control & Threat Dependency Topology Map
               </h3>
               <p className="text-xs text-zinc-500">
-                Visualizing Live Threat (CISA KEV) ➔ NIST Outcome ➔ SP 800-53 Control ➔ Risk ➔ SHA-256 Evidence
+                Visualizing Live Threat (CISA KEV) ➔ NIST Outcome ➔ SP 800-53 Control ➔
+                Risk ➔ SHA-256 Evidence
               </p>
             </div>
           </div>
@@ -39,9 +39,7 @@ export const TopologyMap: React.FC<TopologyMapProps> = ({
 
         {/* Visual Graph View */}
         <div className="flex-1 my-4 bg-zinc-50 border border-zinc-200 rounded-lg p-6 overflow-y-auto flex flex-col items-center justify-center space-y-8 relative">
-          
           <div className="w-full grid grid-cols-5 gap-4 text-center">
-            
             {/* Column 1: Live Threat */}
             <div className="flex flex-col items-center space-y-3">
               <div className="text-[11px] font-semibold text-rose-700 uppercase tracking-wider">
@@ -52,7 +50,9 @@ export const TopologyMap: React.FC<TopologyMapProps> = ({
                   <AlertOctagon className="w-3.5 h-3.5" />
                   <span>CVE-2024-3400</span>
                 </div>
-                <div className="text-[10px] text-zinc-600">PAN-OS Command Injection</div>
+                <div className="text-[10px] text-zinc-600">
+                  PAN-OS Command Injection
+                </div>
               </div>
             </div>
 
@@ -61,9 +61,14 @@ export const TopologyMap: React.FC<TopologyMapProps> = ({
               <div className="text-[11px] font-semibold text-teal-700 uppercase tracking-wider">
                 2. NIST CSF 2.0
               </div>
-              {outcomes.slice(2, 4).map(o => (
-                <div key={o.id} className="w-full bg-white border border-teal-200 rounded-md p-2.5 shadow-xs text-left">
-                  <div className="font-mono text-xs font-semibold text-teal-800">{o.id}</div>
+              {outcomes.slice(2, 4).map((o) => (
+                <div
+                  key={o.id}
+                  className="w-full bg-white border border-teal-200 rounded-md p-2.5 shadow-xs text-left"
+                >
+                  <div className="font-mono text-xs font-semibold text-teal-800">
+                    {o.id}
+                  </div>
                   <div className="text-[10px] text-zinc-500 truncate">{o.category}</div>
                 </div>
               ))}
@@ -75,11 +80,15 @@ export const TopologyMap: React.FC<TopologyMapProps> = ({
                 3. SP 800-53 Controls
               </div>
               <div className="w-full bg-white border border-indigo-200 rounded-md p-2.5 shadow-xs text-left">
-                <div className="font-mono text-xs font-semibold text-indigo-800">AC-2 / IA-2</div>
+                <div className="font-mono text-xs font-semibold text-indigo-800">
+                  AC-2 / IA-2
+                </div>
                 <div className="text-[10px] text-zinc-500">MFA & Access Control</div>
               </div>
               <div className="w-full bg-white border border-indigo-200 rounded-md p-2.5 shadow-xs text-left">
-                <div className="font-mono text-xs font-semibold text-indigo-800">SC-8 / SC-28</div>
+                <div className="font-mono text-xs font-semibold text-indigo-800">
+                  SC-8 / SC-28
+                </div>
                 <div className="text-[10px] text-zinc-500">Data Encryption</div>
               </div>
             </div>
@@ -90,7 +99,9 @@ export const TopologyMap: React.FC<TopologyMapProps> = ({
                 4. EU Regulation
               </div>
               <div className="w-full bg-white border border-amber-200 rounded-md p-2.5 shadow-xs text-left">
-                <div className="font-mono text-xs font-semibold text-amber-800">DORA Art. 9</div>
+                <div className="font-mono text-xs font-semibold text-amber-800">
+                  DORA Art. 9
+                </div>
                 <div className="text-[10px] text-zinc-500">Access Management</div>
               </div>
             </div>
@@ -105,7 +116,6 @@ export const TopologyMap: React.FC<TopologyMapProps> = ({
                 <span>e3b0c442...b855</span>
               </div>
             </div>
-
           </div>
 
           <div className="text-xs text-zinc-500 text-center font-mono">
@@ -122,7 +132,6 @@ export const TopologyMap: React.FC<TopologyMapProps> = ({
             Close Topology Map
           </button>
         </div>
-
       </div>
     </div>
   );

@@ -7,16 +7,15 @@ interface AddOutcomeModalProps {
   onClose: () => void;
 }
 
-export const AddOutcomeModal: React.FC<AddOutcomeModalProps> = ({
-  onAdd,
-  onClose
-}) => {
+export const AddOutcomeModal: React.FC<AddOutcomeModalProps> = ({ onAdd, onClose }) => {
   const [id, setId] = useState('PR.PS-02');
   const [func, setFunc] = useState<FunctionCategory>('PROTECT');
   const [category, setCategory] = useState('Platform Security Hardening');
-  const [description, setDescription] = useState('Security baselines are enforced and audited for operational platform components.');
+  const [description, setDescription] = useState(
+    'Security baselines are enforced and audited for operational platform components.'
+  );
   const [spCode, setSpCode] = useState('CM-7');
-  const [spTitle, setSpTitle] = useState('Least Functionality');
+  const [spTitle] = useState('Least Functionality');
   const [isoCode, setIsoCode] = useState('A.8.9');
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -28,8 +27,16 @@ export const AddOutcomeModal: React.FC<AddOutcomeModalProps> = ({
       function: func,
       category: category.trim(),
       description: description.trim(),
-      sp80053Controls: [{ code: spCode.trim().toUpperCase(), title: spTitle.trim(), family: 'Security Controls' }],
-      iso27001Controls: [{ code: isoCode.trim().toUpperCase(), title: 'Information Security Control' }],
+      sp80053Controls: [
+        {
+          code: spCode.trim().toUpperCase(),
+          title: spTitle.trim(),
+          family: 'Security Controls'
+        }
+      ],
+      iso27001Controls: [
+        { code: isoCode.trim().toUpperCase(), title: 'Information Security Control' }
+      ],
       doraMapping: { article: 'Art. 9', title: 'ICT Protection & Hardening' },
       nis2Mapping: { article: 'Art. 21.2e', title: 'Network System Security' }
     });
@@ -38,8 +45,10 @@ export const AddOutcomeModal: React.FC<AddOutcomeModalProps> = ({
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-zinc-900/40 backdrop-blur-xs p-4">
       <div className="bg-white border border-zinc-200 rounded-lg max-w-lg w-full p-6 shadow-xl relative text-left">
-        
-        <button onClick={onClose} className="absolute top-4 right-4 text-zinc-400 hover:text-zinc-700">
+        <button
+          onClick={onClose}
+          className="absolute top-4 right-4 text-zinc-400 hover:text-zinc-700"
+        >
           <X className="w-5 h-5" />
         </button>
 
@@ -51,12 +60,13 @@ export const AddOutcomeModal: React.FC<AddOutcomeModalProps> = ({
             <h3 className="text-base font-semibold text-zinc-900">
               Add Custom NIST CSF 2.0 Outcome
             </h3>
-            <p className="text-xs text-zinc-500">Extend the ledger with custom subcategories or organizational controls.</p>
+            <p className="text-xs text-zinc-500">
+              Extend the ledger with custom subcategories or organizational controls.
+            </p>
           </div>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-4 font-sans">
-          
           <div className="grid grid-cols-2 gap-3">
             <div>
               <label className="block text-xs font-medium text-zinc-700 mb-1">
@@ -159,7 +169,6 @@ export const AddOutcomeModal: React.FC<AddOutcomeModalProps> = ({
               <span>Add Outcome</span>
             </button>
           </div>
-
         </form>
       </div>
     </div>

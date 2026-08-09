@@ -1,5 +1,5 @@
 import React from 'react';
-import { Layers, ArrowRight, CheckCircle2, AlertCircle, TrendingUp, Target, Award } from 'lucide-react';
+import { AlertCircle, TrendingUp, Target, Award } from 'lucide-react';
 import { NistOutcome, OutcomeDecision } from '../types/ledger';
 
 interface ProfileTierWidgetProps {
@@ -12,38 +12,45 @@ export const ProfileTierWidget: React.FC<ProfileTierWidgetProps> = ({
   decisions
 }) => {
   const totalOutcomes = outcomes.length;
-  const supportedDecisions = outcomes.filter(o => decisions[o.id]?.status === 'SUPPORTED');
+  const supportedDecisions = outcomes.filter(
+    (o) => decisions[o.id]?.status === 'SUPPORTED'
+  );
   const supportedCount = supportedDecisions.length;
-  const evidenceCount = supportedDecisions.filter(o => Boolean(decisions[o.id]?.evidence?.referenceHash)).length;
-  const gapOutcomes = outcomes.filter(o => decisions[o.id]?.status !== 'SUPPORTED');
+  const evidenceCount = supportedDecisions.filter((o) =>
+    Boolean(decisions[o.id]?.evidence?.referenceHash)
+  ).length;
+  const gapOutcomes = outcomes.filter((o) => decisions[o.id]?.status !== 'SUPPORTED');
   const percentage = Math.round((supportedCount / totalOutcomes) * 100);
 
   // Compute NIST Implementation Tier
   let currentTierName = 'Tier 1: Partial';
   let currentTierLevel = 1;
-  let tierDescription = 'Security activities are reactive and handled ad-hoc with limited audit evidence.';
+  let tierDescription =
+    'Security activities are reactive and handled ad-hoc with limited audit evidence.';
   let targetTierName = 'Tier 3: Repeatable';
 
   if (percentage >= 90 && evidenceCount >= supportedCount - 1) {
     currentTierName = 'Tier 4: Adaptive';
     currentTierLevel = 4;
-    tierDescription = 'Security practices adapt dynamically based on continuous threat feeds & automated evidence.';
+    tierDescription =
+      'Security practices adapt dynamically based on continuous threat feeds & automated evidence.';
     targetTierName = 'Tier 4: Adaptive (Maintained)';
   } else if (percentage >= 65 && evidenceCount >= Math.floor(supportedCount * 0.6)) {
     currentTierName = 'Tier 3: Repeatable';
     currentTierLevel = 3;
-    tierDescription = 'Formal security policies and controls are consistently applied and evidence-backed.';
+    tierDescription =
+      'Formal security policies and controls are consistently applied and evidence-backed.';
     targetTierName = 'Tier 4: Adaptive';
   } else if (percentage >= 35) {
     currentTierName = 'Tier 2: Risk-Informed';
     currentTierLevel = 2;
-    tierDescription = 'Risk management practices are approved by management, but formal evidence is incomplete.';
+    tierDescription =
+      'Risk management practices are approved by management, but formal evidence is incomplete.';
     targetTierName = 'Tier 3: Repeatable';
   }
 
   return (
     <div className="bg-white border border-zinc-200 rounded-lg p-5 mb-6 shadow-xs text-left">
-      
       {/* Title Header */}
       <div className="flex items-center justify-between mb-4 pb-3 border-b border-zinc-200">
         <div className="flex items-center space-x-2">
@@ -55,7 +62,8 @@ export const ProfileTierWidget: React.FC<ProfileTierWidgetProps> = ({
               NIST CSF 2.0 Implementation Tier & Gap Analysis
             </h2>
             <p className="text-xs text-zinc-500">
-              Current Profile vs. Target Profile progression roadmap and required gap remediations.
+              Current Profile vs. Target Profile progression roadmap and required gap
+              remediations.
             </p>
           </div>
         </div>
@@ -66,7 +74,6 @@ export const ProfileTierWidget: React.FC<ProfileTierWidgetProps> = ({
 
       {/* Tier Progression Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-5">
-        
         {/* Current Profile Card */}
         <div className="bg-zinc-50 border border-zinc-200 rounded-md p-4 flex flex-col justify-between">
           <div>
@@ -87,7 +94,8 @@ export const ProfileTierWidget: React.FC<ProfileTierWidgetProps> = ({
             </p>
           </div>
           <div className="text-[11px] font-mono text-zinc-500">
-            ✓ {supportedCount} of {totalOutcomes} Outcomes Supported ({evidenceCount} SHA-256 Evidence Verified)
+            ✓ {supportedCount} of {totalOutcomes} Outcomes Supported ({evidenceCount}{' '}
+            SHA-256 Evidence Verified)
           </div>
         </div>
 
@@ -107,14 +115,15 @@ export const ProfileTierWidget: React.FC<ProfileTierWidgetProps> = ({
               <span>{targetTierName}</span>
             </h3>
             <p className="text-xs text-teal-900 leading-relaxed mb-3">
-              Full alignment with NIST SP 800-53 Rev. 5 controls, EU DORA/NIS2 mandates, and 100% evidence hashing.
+              Full alignment with NIST SP 800-53 Rev. 5 controls, EU DORA/NIS2 mandates,
+              and 100% evidence hashing.
             </p>
           </div>
           <div className="text-[11px] font-mono text-teal-800">
-            🎯 Target Action Plan: Remediate remaining {gapOutcomes.length} gaps listed below.
+            🎯 Target Action Plan: Remediate remaining {gapOutcomes.length} gaps listed
+            below.
           </div>
         </div>
-
       </div>
 
       {/* Required Action List to Reach Next Tier */}
@@ -125,8 +134,11 @@ export const ProfileTierWidget: React.FC<ProfileTierWidgetProps> = ({
             <span>Gap Remediation Checklist (Required to reach {targetTierName}):</span>
           </h4>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
-            {gapOutcomes.map(o => (
-              <div key={o.id} className="bg-white border border-amber-200/60 rounded p-2 text-xs flex items-start space-x-2">
+            {gapOutcomes.map((o) => (
+              <div
+                key={o.id}
+                className="bg-white border border-amber-200/60 rounded p-2 text-xs flex items-start space-x-2"
+              >
                 <span className="font-mono font-semibold text-amber-800 text-[11px] bg-amber-100 px-1.5 py-0.5 rounded">
                   {o.id}
                 </span>
@@ -138,7 +150,6 @@ export const ProfileTierWidget: React.FC<ProfileTierWidgetProps> = ({
           </div>
         </div>
       )}
-
     </div>
   );
 };

@@ -1,6 +1,6 @@
 # CSF Outcome Ledger
 
-Local-First NIST CSF 2.0 & EU DORA Workbench with Live CISA Threat Intelligence & SHA-256 Provenance
+Local-First NIST CSF 2.0 & EU DORA Workbench with CISA KEV Context & SHA-256 Provenance
 
 ![CSF Outcome Ledger Banner](docs/csf_outcome_ledger_banner.png)
 
@@ -19,7 +19,11 @@ Unlike typical GRC platforms that collapse security posture into arbitrary perce
 
 - **NIST CSF 2.0 to SP 800-53 & ISO 27001 Mapping:** Built-in mapping database linking high-level outcomes (`PR.AA-01`, `DE.AE-01`, `PR.DS-01`) to technical control families (`AC-2`, `IA-2`, `SC-8`, `AU-2`).
 - **EU DORA & NIS2 Regulatory Overlays:** Toggleable regulatory mapping for European enterprise compliance (Financial Services & Critical Infrastructure).
-- **Live CISA Sector Threat Feed (KEV API):** Real-time fetcher connecting CISA Known Exploited Vulnerabilities to security control requirements.
+- **CISA KEV context:** Reads the published Known Exploited Vulnerabilities
+  catalogue and shows the most recent entries with the fields CISA actually
+  publishes. When the feed cannot be reached the panel shows a dated offline
+  sample and says so; it never presents stale data as live. No severity or
+  sector rating is invented, because CISA publishes neither.
 - **Client-Side SHA-256 Evidence Hasher:** Local Web Crypto hashing of audit evidence files. Zero cloud upload—100% data sovereignty and cryptographic auditability.
 - **Interactive Dependency Topology Map:** Visual node graph displaying end-to-end traceability (`Threat Feed ➔ NIST Outcome ➔ SP 800-53 Control ➔ Risk Scenario ➔ SHA-256 Evidence`).
 - **One-Click CISO Executive Board Report:** Export print-ready executive summaries for CISO and Board presentations.

@@ -1,0 +1,63 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  quality:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
+
+      - name: Set up Node
+        uses: actions/setup-node@a0853c24544627f65ddf259abe73b1d18a591444 # v5.0.0
+        with:
+          node-version: '22'
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Check formatting
+        run: npm run format:check
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Type check
+        run: npm run typecheck
+
+      - name: Unit tests
+        run: npm run test
+
+      - name: Build
+        run: npm run build
+
+      # The CISA catalogue publishes a fixed set of fields. If it ever gains
+      # or loses one, the parser should be revisited deliberately rather
+      # than discovered through a broken panel, so the shape is asserted
+      # here against the live feed. Informational only: an outage upstream
+      # must not fail the build.
+      - name: Check the CISA KEV schema has not moved
+        continue-on-error: true
+        run: |
+          curl -sS --max-time 30 \
+            https://www.cisa.gov/sites/default/files/feeds/known_exploited_vulnerabilities.json \
+            -o kev.json
+          node --input-type=module -e "
+            import { readFileSync } from 'node:fs';
+            const expected = ['cveID','vendorProject','product','vulnerabilityName',
+              'dateAdded','shortDescription','requiredAction','dueDate',
+              'knownRansomwareCampaignUse'];
+            const kev = JSON.parse(readFileSync('kev.json','utf8'));
+            const first = kev.vulnerabilities[0];
+            const missing = expected.filter(k => !(k in first));
+            if (missing.length) {
+              console.error('CISA KEV no longer publishes:', missing.join(', '));
+              process.exit(1);
+            }
+            console.log('KEV schema unchanged;', kev.vulnerabilities.length, 'entries');
+          "

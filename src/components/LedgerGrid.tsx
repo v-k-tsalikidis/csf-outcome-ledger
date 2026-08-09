@@ -1,6 +1,11 @@
 import React, { useState } from 'react';
-import { ShieldCheck, AlertCircle, Clock, Hash, AlertTriangle, ChevronRight, Globe, Layers, PlusCircle, Filter } from 'lucide-react';
-import { NistOutcome, OutcomeDecision, MappingStatus, FunctionCategory } from '../types/ledger';
+import { Hash, AlertTriangle, PlusCircle, Filter } from 'lucide-react';
+import {
+  NistOutcome,
+  OutcomeDecision,
+  MappingStatus,
+  FunctionCategory
+} from '../types/ledger';
 import { formatShortHash } from '../utils/cryptoUtils';
 
 interface LedgerGridProps {
@@ -22,25 +27,27 @@ export const LedgerGrid: React.FC<LedgerGridProps> = ({
   onOpenRiskDrawer,
   onOpenAddOutcomeModal
 }) => {
-  const [selectedFunction, setSelectedFunction] = useState<FunctionCategory | 'ALL'>('ALL');
+  const [selectedFunction, setSelectedFunction] = useState<FunctionCategory | 'ALL'>(
+    'ALL'
+  );
 
-  const filteredOutcomes = selectedFunction === 'ALL'
-    ? outcomes
-    : outcomes.filter(o => o.function === selectedFunction);
+  const filteredOutcomes =
+    selectedFunction === 'ALL'
+      ? outcomes
+      : outcomes.filter((o) => o.function === selectedFunction);
 
   const functionCounts = {
     ALL: outcomes.length,
-    GOVERN: outcomes.filter(o => o.function === 'GOVERN').length,
-    IDENTIFY: outcomes.filter(o => o.function === 'IDENTIFY').length,
-    PROTECT: outcomes.filter(o => o.function === 'PROTECT').length,
-    DETECT: outcomes.filter(o => o.function === 'DETECT').length,
-    RESPOND: outcomes.filter(o => o.function === 'RESPOND').length,
-    RECOVER: outcomes.filter(o => o.function === 'RECOVER').length
+    GOVERN: outcomes.filter((o) => o.function === 'GOVERN').length,
+    IDENTIFY: outcomes.filter((o) => o.function === 'IDENTIFY').length,
+    PROTECT: outcomes.filter((o) => o.function === 'PROTECT').length,
+    DETECT: outcomes.filter((o) => o.function === 'DETECT').length,
+    RESPOND: outcomes.filter((o) => o.function === 'RESPOND').length,
+    RECOVER: outcomes.filter((o) => o.function === 'RECOVER').length
   };
 
   return (
     <div className="bg-white border border-zinc-200 rounded-lg shadow-xs overflow-hidden text-left">
-      
       {/* Header & Controls */}
       <div className="px-5 py-4 border-b border-zinc-200 bg-zinc-50/50 flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
@@ -53,7 +60,8 @@ export const LedgerGrid: React.FC<LedgerGridProps> = ({
             )}
           </h2>
           <p className="text-xs text-zinc-500 mt-0.5">
-            Local-first decision records with audit rationale, SHA-256 evidence hashing, and risk context.
+            Local-first decision records with audit rationale, SHA-256 evidence hashing,
+            and risk context.
           </p>
         </div>
 
@@ -71,7 +79,17 @@ export const LedgerGrid: React.FC<LedgerGridProps> = ({
         <span className="text-[11px] text-zinc-400 font-mono uppercase tracking-wider mr-2 flex items-center gap-1">
           <Filter className="w-3 h-3" /> Function:
         </span>
-        {(['ALL', 'GOVERN', 'IDENTIFY', 'PROTECT', 'DETECT', 'RESPOND', 'RECOVER'] as const).map((fn) => (
+        {(
+          [
+            'ALL',
+            'GOVERN',
+            'IDENTIFY',
+            'PROTECT',
+            'DETECT',
+            'RESPOND',
+            'RECOVER'
+          ] as const
+        ).map((fn) => (
           <button
             key={fn}
             onClick={() => setSelectedFunction(fn)}
@@ -89,14 +107,17 @@ export const LedgerGrid: React.FC<LedgerGridProps> = ({
       {/* Main Ledger Items */}
       <div className="divide-y divide-zinc-200">
         {filteredOutcomes.map((outcome) => {
-          const decision = decisions[outcome.id] || { outcomeId: outcome.id, status: 'UNSUPPORTED', lastUpdated: 'Never' };
+          const decision = decisions[outcome.id] || {
+            outcomeId: outcome.id,
+            status: 'UNSUPPORTED',
+            lastUpdated: 'Never'
+          };
           const hasEvidence = Boolean(decision.evidence?.referenceHash);
           const hasRisk = Boolean(decision.riskContext?.scenario);
 
           return (
             <div key={outcome.id} className="p-5 hover:bg-zinc-50/40 transition-colors">
               <div className="flex flex-col lg:flex-row lg:items-start justify-between gap-4">
-                
                 {/* Left: Outcome Info & Cross-Mappings */}
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center space-x-2 mb-1.5">
@@ -114,15 +135,23 @@ export const LedgerGrid: React.FC<LedgerGridProps> = ({
 
                   {/* Badges: SP 800-53, ISO 27001, DORA */}
                   <div className="flex flex-wrap items-center gap-1.5">
-                    <span className="text-[10px] text-zinc-400 font-mono uppercase mr-1">Controls:</span>
+                    <span className="text-[10px] text-zinc-400 font-mono uppercase mr-1">
+                      Controls:
+                    </span>
                     {outcome.sp80053Controls.map((c) => (
-                      <span key={c.code} className="inline-flex items-center text-[10px] font-mono bg-indigo-50/70 text-indigo-800 border border-indigo-200/80 px-2 py-0.5 rounded">
+                      <span
+                        key={c.code}
+                        className="inline-flex items-center text-[10px] font-mono bg-indigo-50/70 text-indigo-800 border border-indigo-200/80 px-2 py-0.5 rounded"
+                      >
                         NIST {c.code} ({c.title})
                       </span>
                     ))}
 
                     {outcome.iso27001Controls?.map((iso) => (
-                      <span key={iso.code} className="inline-flex items-center text-[10px] font-mono bg-zinc-100 text-zinc-700 border border-zinc-200 px-2 py-0.5 rounded">
+                      <span
+                        key={iso.code}
+                        className="inline-flex items-center text-[10px] font-mono bg-zinc-100 text-zinc-700 border border-zinc-200 px-2 py-0.5 rounded"
+                      >
                         ISO {iso.code}
                       </span>
                     ))}
@@ -137,19 +166,20 @@ export const LedgerGrid: React.FC<LedgerGridProps> = ({
 
                 {/* Right: Actions & Decision Inputs */}
                 <div className="flex flex-wrap sm:flex-nowrap items-center gap-2.5 lg:self-start">
-                  
                   {/* Status Dropdown */}
                   <select
                     value={decision.status}
-                    onChange={(e) => onUpdateStatus(outcome.id, e.target.value as MappingStatus)}
+                    onChange={(e) =>
+                      onUpdateStatus(outcome.id, e.target.value as MappingStatus)
+                    }
                     className={`text-xs font-semibold px-2.5 py-1.5 rounded-md border focus:outline-none cursor-pointer transition-colors ${
                       decision.status === 'SUPPORTED'
                         ? 'bg-teal-50 text-teal-800 border-teal-200'
                         : decision.status === 'UNSUPPORTED'
-                        ? 'bg-rose-50 text-rose-800 border-rose-200'
-                        : decision.status === 'STALE'
-                        ? 'bg-amber-50 text-amber-800 border-amber-200'
-                        : 'bg-zinc-100 text-zinc-700 border-zinc-200'
+                          ? 'bg-rose-50 text-rose-800 border-rose-200'
+                          : decision.status === 'STALE'
+                            ? 'bg-amber-50 text-amber-800 border-amber-200'
+                            : 'bg-zinc-100 text-zinc-700 border-zinc-200'
                     }`}
                   >
                     <option value="SUPPORTED">✓ SUPPORTED</option>
@@ -169,7 +199,9 @@ export const LedgerGrid: React.FC<LedgerGridProps> = ({
                   >
                     <Hash className="w-3.5 h-3.5" />
                     <span>
-                      {hasEvidence ? `Hash: ${formatShortHash(decision.evidence?.referenceHash || '')}` : '# Add Evidence'}
+                      {hasEvidence
+                        ? `Hash: ${formatShortHash(decision.evidence?.referenceHash || '')}`
+                        : '# Add Evidence'}
                     </span>
                   </button>
 
@@ -183,17 +215,18 @@ export const LedgerGrid: React.FC<LedgerGridProps> = ({
                     }`}
                   >
                     <AlertTriangle className="w-3.5 h-3.5" />
-                    <span>{hasRisk ? `Risk: ${decision.riskContext?.likelihood}` : 'Risk Assessment'}</span>
+                    <span>
+                      {hasRisk
+                        ? `Risk: ${decision.riskContext?.likelihood}`
+                        : 'Risk Assessment'}
+                    </span>
                   </button>
-
                 </div>
-
               </div>
             </div>
           );
         })}
       </div>
-
     </div>
   );
 };

@@ -9,8 +9,17 @@ import { CisoBoardReportModal } from './components/CisoBoardReportModal';
 import { ProfileTierWidget } from './components/ProfileTierWidget';
 import { AddOutcomeModal } from './components/AddOutcomeModal';
 import { NIST_CSF_OUTCOMES } from './data/nistCsfData';
+import { validateImport } from './services/importValidation';
 import { fetchCisaKevThreatFeed } from './services/cisaKevApi';
-import { OutcomeDecision, MappingStatus, EvidenceRecord, RiskContext, CisaKevEntry, ThreatIndex, NistOutcome } from './types/ledger';
+import {
+  OutcomeDecision,
+  MappingStatus,
+  EvidenceRecord,
+  RiskContext,
+  CisaKevEntry,
+  ThreatIndex,
+  NistOutcome
+} from './types/ledger';
 
 const LOCAL_STORAGE_KEY = 'csf_outcome_ledger_decisions_v1';
 const LOCAL_STORAGE_OUTCOMES_KEY = 'csf_outcome_ledger_custom_outcomes_v1';
@@ -21,15 +30,22 @@ export function App() {
   const [doraOverlayActive, setDoraOverlayActive] = useState(true);
   const [threatEntries, setThreatEntries] = useState<CisaKevEntry[]>([]);
   const [threatIndex, setThreatIndex] = useState<ThreatIndex>({
-    overallLevel: 'HIGH',
-    activeSectorKevs: 3,
-    lastSync: 'Syncing...'
+    source: 'offline-sample',
+    ransomwareLinked: 0,
+    pastDue: 0,
+    shown: 0,
+    catalogueSize: null,
+    retrievedAt: null
   });
   const [threatLoading, setThreatLoading] = useState(false);
 
   // Modals & Drawers state
-  const [activeEvidenceModalOutcomeId, setActiveEvidenceModalOutcomeId] = useState<string | null>(null);
-  const [activeRiskDrawerOutcomeId, setActiveRiskDrawerOutcomeId] = useState<string | null>(null);
+  const [activeEvidenceModalOutcomeId, setActiveEvidenceModalOutcomeId] = useState<
+    string | null
+  >(null);
+  const [activeRiskDrawerOutcomeId, setActiveRiskDrawerOutcomeId] = useState<
+    string | null
+  >(null);
   const [topologyMapOpen, setTopologyMapOpen] = useState(false);
   const [cisoReportModalOpen, setCisoReportModalOpen] = useState(false);
   const [addOutcomeModalOpen, setAddOutcomeModalOpen] = useState(false);
@@ -49,11 +65,13 @@ export function App() {
             evidence: {
               id: 'EVD-001',
               documentName: 'Identity_MFA_Enforcement_Policy_2026.pdf',
-              referenceHash: 'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855',
+              referenceHash:
+                'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855',
               reviewerName: 'Basil Tsalikidis (InfoSec Officer)',
               reviewDate: '2026-06-15',
               expiryDate: '2027-06-15',
-              rationale: 'MFA enforced across enterprise VPN and NATO CIS gateways per ISO 27001 & DORA Article 9.'
+              rationale:
+                'MFA enforced across enterprise VPN and NATO CIS gateways per ISO 27001 & DORA Article 9.'
             }
           }
         };
@@ -104,7 +122,9 @@ export function App() {
     setOutcomes(updatedOutcomes);
 
     // Save custom additions
-    const customOnly = updatedOutcomes.filter(o => !NIST_CSF_OUTCOMES.some(defaultO => defaultO.id === o.id));
+    const customOnly = updatedOutcomes.filter(
+      (o) => !NIST_CSF_OUTCOMES.some((defaultO) => defaultO.id === o.id)
+    );
     localStorage.setItem(LOCAL_STORAGE_OUTCOMES_KEY, JSON.stringify(customOnly));
 
     setAddOutcomeModalOpen(false);
@@ -150,36 +170,58 @@ export function App() {
       decisions,
       exportedAt: new Date().toISOString()
     };
-    const dataStr = 'data:text/json;charset=utf-8,' + encodeURIComponent(JSON.stringify(exportData, null, 2));
+    const dataStr =
+      'data:text/json;charset=utf-8,' +
+      encodeURIComponent(JSON.stringify(exportData, null, 2));
     const downloadAnchor = document.createElement('a');
     downloadAnchor.setAttribute('href', dataStr);
-    downloadAnchor.setAttribute('download', `csf_outcome_ledger_export_${new Date().toISOString().split('T')[0]}.json`);
+    downloadAnchor.setAttribute(
+      'download',
+      `csf_outcome_ledger_export_${new Date().toISOString().split('T')[0]}.json`
+    );
     document.body.appendChild(downloadAnchor);
     downloadAnchor.click();
     downloadAnchor.remove();
   };
 
-  // Import JSON
-  const handleImportJson = (importedData: Record<string, any>) => {
-    if (importedData.decisions) {
-      setDecisions(importedData.decisions);
-      localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(importedData.decisions));
-      if (importedData.outcomes && Array.isArray(importedData.outcomes)) {
-        setOutcomes(importedData.outcomes);
-      }
-    } else {
-      setDecisions(importedData);
-      localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(importedData));
+  // Import JSON. An export can be hand-edited before it comes back, so
+  // every record is validated and anything unusable is reported rather
+  // than written into the ledger.
+  const handleImportJson = (importedData: Record<string, unknown>) => {
+    const {
+      decisions: parsed,
+      outcomes: parsedOutcomes,
+      rejected
+    } = validateImport(importedData);
+
+    const accepted = Object.keys(parsed).length;
+    if (accepted === 0) {
+      alert(
+        `Nothing was imported. ${rejected.length} record(s) could not be read:\n\n` +
+          rejected.slice(0, 10).join('\n')
+      );
+      return;
     }
-    alert('Ledger dataset imported successfully! All control mapping decisions, evidence hashes, and risk contexts have been loaded.');
+
+    setDecisions(parsed);
+    localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(parsed));
+    if (parsedOutcomes) setOutcomes(parsedOutcomes);
+
+    alert(
+      rejected.length === 0
+        ? `Imported ${accepted} mapping decision(s).`
+        : `Imported ${accepted} mapping decision(s). ` +
+            `${rejected.length} were skipped:\n\n${rejected.slice(0, 10).join('\n')}`
+    );
   };
 
-  const activeEvidenceOutcome = outcomes.find(o => o.id === activeEvidenceModalOutcomeId);
-  const activeRiskOutcome = outcomes.find(o => o.id === activeRiskDrawerOutcomeId);
+  const activeEvidenceOutcome = outcomes.find(
+    (o) => o.id === activeEvidenceModalOutcomeId
+  );
+  const activeRiskOutcome = outcomes.find((o) => o.id === activeRiskDrawerOutcomeId);
 
   return (
     <div className="min-h-screen bg-[#faf9f6] flex flex-col font-sans">
-      
       {/* Header Bar */}
       <Header
         threatIndex={threatIndex}
@@ -193,19 +235,16 @@ export function App() {
 
       {/* Main Container */}
       <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        
         {/* Live CISA KEV Threat Intelligence Panel */}
         <ThreatIntelligencePanel
+          index={threatIndex}
           entries={threatEntries}
           loading={threatLoading}
           onRefresh={handleSyncThreatFeed}
         />
 
         {/* NIST CSF 2.0 Implementation Tier & Profile Progression */}
-        <ProfileTierWidget
-          outcomes={outcomes}
-          decisions={decisions}
-        />
+        <ProfileTierWidget outcomes={outcomes} decisions={decisions} />
 
         {/* NIST CSF 2.0 & SP 800-53 / DORA Mapping Ledger */}
         <LedgerGrid
@@ -217,13 +256,14 @@ export function App() {
           onOpenRiskDrawer={(id) => setActiveRiskDrawerOutcomeId(id)}
           onOpenAddOutcomeModal={() => setAddOutcomeModalOpen(true)}
         />
-
       </main>
 
       {/* Footer */}
       <footer className="bg-white border-t border-zinc-200 py-6 mt-12 text-center text-xs text-zinc-500 font-mono">
         <p>CSF Outcome Ledger v1.0.0 — Open Source NIST CSF 2.0 & EU DORA Workbench</p>
-        <p className="mt-1 text-zinc-400">Created by Vasileios (Basil) Tsalikidis — MIT License</p>
+        <p className="mt-1 text-zinc-400">
+          Created by Vasileios (Basil) Tsalikidis — MIT License
+        </p>
       </footer>
 
       {/* Modals & Drawers */}
@@ -268,7 +308,6 @@ export function App() {
           onClose={() => setAddOutcomeModalOpen(false)}
         />
       )}
-
     </div>
   );
 }
