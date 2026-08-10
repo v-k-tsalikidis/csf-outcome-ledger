@@ -33,28 +33,67 @@ Unlike typical GRC platforms that collapse security posture into arbitrary perce
 
 ## Quick Start
 
-### Prerequisites
-- Node.js 18+ and npm
+You need Node.js 18 or newer. Check with `node --version`; if that fails,
+install it from [nodejs.org](https://nodejs.org/).
 
-### Installation & Execution
+**1. Get the code and go into the folder.**
 
 ```bash
-# Clone the repository
 git clone https://github.com/v-k-tsalikidis/csf-outcome-ledger.git
+```
 
-# Navigate into project directory
+```bash
 cd csf-outcome-ledger
+```
 
-# Install dependencies
+**2. Install the dependencies.** This downloads what the app needs into a
+local `node_modules` folder and changes nothing else on your machine.
+
+```bash
 npm install
+```
 
-# Run dev server
+**3. Start it.**
+
+```bash
 npm run dev
 ```
 
-Open [http://localhost:5173](http://localhost:5173) in your web browser.
+Open [http://localhost:5173](http://localhost:5173). Press `Ctrl+C` in the
+terminal to stop it.
 
----
+### What you will see
+
+The grid lists NIST CSF 2.0 outcomes. For each one you record what you
+decided and why: the status, the document that supports it, who reviewed it,
+and when that review expires. The app computes no compliance percentage,
+because a percentage cannot be audited and a decision can.
+
+Everything stays in your browser's local storage. Nothing is uploaded. Use
+**Export** to save your work as a JSON file, and **Import** to load it back or
+move it to another machine.
+
+The panel at the top reads the CISA Known Exploited Vulnerabilities catalogue
+for context. If the feed cannot be reached, the panel says so and shows a
+dated offline sample instead. It never presents old data as current.
+
+### If something goes wrong
+
+- `npm: command not found` — Node.js is not installed, or the terminal needs
+  reopening after installing it.
+- The port is busy — run `npm run dev -- --port 5174` and open that instead.
+- The threat panel shows "Offline sample" — your network or browser blocked
+  the request to cisa.gov. The rest of the app is unaffected.
+
+### Running the checks
+
+```bash
+npm test
+```
+
+```bash
+npm run lint && npm run typecheck
+```
 
 ## Architecture & Data Sovereignty
 

@@ -20,9 +20,9 @@ The dashboard is structured into 4 main sections from top to bottom:
 
 1. **Top Bar (Header)**:
    - **Logo & Title**: Indicates the application version (`v1.0.0`).
-   - **Sector Threat Index**: Shows real-time threat levels based on live vulnerability feeds.
+   - **CISA KEV catalogue**: The size of the published Known Exploited Vulnerabilities catalogue and when it was read. When the feed is unreachable the panel says "offline sample" and shows dated records rather than pretending they are current.
    - **EU DORA / NIS2 Overlay**: Click to reveal European regulatory requirements alongside NIST controls.
-   - **Topology Map**: Opens a visual diagram showing how threat feeds, controls, and evidence connect.
+   - **Topology Map**: Opens a visual diagram showing how outcomes, controls, and evidence connect.
    - **CISO Board Report**: Generates a 1-click printable summary for executive management.
    - **Upload / Download Icons**: For batch importing or saving your ledger progress as a JSON file.
 
@@ -91,3 +91,26 @@ Click the status dropdown on the right side of the outcome card:
 
 - **Zero Cloud Risk**: All your data stays 100% inside your web browser. You can safely use this tool offline.
 - **Tier Progression**: As you add supported outcomes and SHA-256 evidence, watch your **Current Profile Tier** automatically upgrade from *Tier 1 Partial* to *Tier 3 Repeatable*.
+
+## Running the checks yourself
+
+If you change anything, these three tell you whether it still holds together.
+
+```bash
+npm test
+```
+
+Runs the test suite. It covers how the CISA feed is parsed, how the offline
+fallback is labelled, and what an imported ledger file is allowed to contain.
+
+```bash
+npm run lint && npm run typecheck
+```
+
+Checks style and types. Both must be clean before a change is finished.
+
+```bash
+npm run build
+```
+
+Produces the static files in `dist/`, which is what you would publish.

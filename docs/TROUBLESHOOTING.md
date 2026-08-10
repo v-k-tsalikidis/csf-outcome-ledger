@@ -77,9 +77,9 @@ npm run build
 The interface is designed under a **Premium Minimalist Light** layout. Here is how an auditor or CISO interacts with the system from **Top-to-Bottom, Left-to-Right**:
 
 ### 1. Top Navigation Bar (Header)
-- **Sector Threat Index (Top Center)**: Displays the live threat level computed from CISA’s Known Exploited Vulnerabilities (KEV) feed.
+- **CISA KEV catalogue (Top Center)**: Shows how many entries the catalogue holds and when they were retrieved. If the live feed cannot be reached it reads "offline sample" instead, so you always know whether you are looking at current data. There is deliberately no headline threat level: CISA does not publish one, and this tool does not invent numbers.
 - **EU DORA / NIS2 Overlay (Button)**: Toggle to instantly reveal European DORA & NIS2 regulatory compliance articles for every control.
-- **Topology Map (Button)**: Opens an interactive visual graph connecting `Live Threat ➔ NIST Outcome ➔ SP 800-53 Control ➔ Risk Scenario ➔ SHA-256 Evidence`.
+- **Topology Map (Button)**: Opens a visual graph connecting `NIST Outcome ➔ SP 800-53 Control ➔ Risk Scenario ➔ SHA-256 Evidence`.
 - **CISO Board Report (Button)**: Generates a 1-click, print-ready executive summary for Board & CISO presentations.
 - **Upload / Download (Icons)**:
   - **Upload (Import JSON)**: Instant batch import of any previously exported `ledger.json` dataset without manual entry.
