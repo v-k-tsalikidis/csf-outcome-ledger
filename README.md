@@ -1,8 +1,11 @@
 # CSF Outcome Ledger
 
-Local-First NIST CSF 2.0 & EU DORA Workbench with CISA KEV Context & SHA-256 Provenance
+Record why a control supports a NIST CSF 2.0 outcome, what evidence backs
+that decision, and when the decision expires. Everything stays in your
+browser.
 
-![CSF Outcome Ledger Banner](docs/csf_outcome_ledger_banner.png)
+Part of the Ledger tools: small local-first instruments that record a decision
+and the evidence behind it.
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 [![NIST CSF 2.0](https://img.shields.io/badge/NIST%20CSF-2.0-teal)](https://www.nist.gov/cyberframework)
@@ -39,7 +42,7 @@ install it from [nodejs.org](https://nodejs.org/).
 **1. Get the code and go into the folder.**
 
 ```bash
-git clone https://github.com/v-k-tsalikidis/csf-outcome-ledger.git
+git clone https://github.com/v-k-tsalikidis/CSF-Outcome-Ledger.git
 ```
 
 ```bash

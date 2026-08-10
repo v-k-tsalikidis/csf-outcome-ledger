@@ -43,6 +43,6 @@ This project is **100% Free & Open Source (MIT License)**. I would truly appreci
 💬 **Drop your thoughts / feedback** in the comments or open an Issue on GitHub if you encounter any edge cases or have ideas for `v1.1`.
 
 📂 **Explore the Code & Run Locally:**  
-https://github.com/v-k-tsalikidis/csf-outcome-ledger
+https://github.com/v-k-tsalikidis/CSF-Outcome-Ledger
 
 #CyberSecurity #NIST #NISTCSF2 #GRC #DORA #NIS2 #InformationSecurity #NATO #CISA #WebSecurity #TypeScript #OpenSource
