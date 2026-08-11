@@ -12,6 +12,11 @@ name: Pages
 on:
   push:
     branches: [main]
+  # The published page carries a copy of the CISA KEV catalogue taken at
+  # build time. Redeploying each morning keeps that copy recent; without
+  # this it would age quietly until someone next pushed.
+  schedule:
+    - cron: '17 6 * * *'
   workflow_dispatch:
 
 permissions:
@@ -43,6 +48,15 @@ jobs:
 
       - name: Unit tests
         run: npm run test
+
+      # A browser cannot fetch the CISA catalogue: the endpoint sends no
+      # Access-Control-Allow-Origin header, so the request is blocked on
+      # every origin. Taking the copy here, where CORS does not apply, is
+      # what makes the panel show something current. It is still labelled a
+      # snapshot, with the date, and a failure here does not stop the
+      # deploy.
+      - name: Snapshot the CISA KEV catalogue
+        run: node scripts/fetch-kev-snapshot.mjs
 
       # `npm run build` is `tsc && vite build`, so a type error stops the
       # deploy rather than shipping a page that fails at runtime.

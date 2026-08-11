@@ -14,7 +14,7 @@ and the evidence behind it.
 
 CSF Outcome Ledger is an independent, local-first web application designed for recording, mapping, and validating cybersecurity controls against NIST CSF 2.0, NIST SP 800-53 Rev. 5, ISO 27001:2022, DORA (Articles 5-14), and NIS2 (Article 21).
 
-Unlike typical GRC platforms that collapse security posture into arbitrary percentage scores, CSF Outcome Ledger focuses on audit provenance, human mapping rationale, SHA-256 evidence hashing, and live threat feed correlation.
+Unlike typical GRC platforms that collapse security posture into arbitrary percentage scores, CSF Outcome Ledger focuses on audit provenance, human mapping rationale, SHA-256 evidence hashing, and dated CISA KEV context.
 
 ---
 
@@ -22,11 +22,15 @@ Unlike typical GRC platforms that collapse security posture into arbitrary perce
 
 - **NIST CSF 2.0 to SP 800-53 & ISO 27001 Mapping:** Built-in mapping database linking high-level outcomes (`PR.AA-01`, `DE.AE-01`, `PR.DS-01`) to technical control families (`AC-2`, `IA-2`, `SC-8`, `AU-2`).
 - **EU DORA & NIS2 Regulatory Overlays:** Toggleable regulatory mapping for European enterprise compliance (Financial Services & Critical Infrastructure).
-- **CISA KEV context:** Reads the published Known Exploited Vulnerabilities
-  catalogue and shows the most recent entries with the fields CISA actually
-  publishes. When the feed cannot be reached the panel shows a dated offline
-  sample and says so; it never presents stale data as live. No severity or
-  sector rating is invented, because CISA publishes neither.
+- **CISA KEV context:** Shows the most recently added Known Exploited
+  Vulnerabilities with the fields CISA actually publishes. The catalogue
+  cannot be fetched from a browser -- the endpoint sends no
+  `Access-Control-Allow-Origin` header, so every browser blocks the request
+  on every origin -- so the deploy takes a copy server-side and the app reads
+  that from its own origin. The panel names which of the three it is showing
+  and when it was taken: the live feed, the copy from the last build, or the
+  sample compiled into the bundle. It never presents a dated copy as live.
+  No severity or sector rating is invented, because CISA publishes neither.
 - **Client-Side SHA-256 Evidence Hasher:** Local Web Crypto hashing of audit evidence files. Zero cloud upload—100% data sovereignty and cryptographic auditability.
 - **Interactive Dependency Topology Map:** Visual node graph displaying end-to-end traceability (`Threat Feed ➔ NIST Outcome ➔ SP 800-53 Control ➔ Risk Scenario ➔ SHA-256 Evidence`).
 - **One-Click CISO Executive Board Report:** Export print-ready executive summaries for CISO and Board presentations.
@@ -103,7 +107,9 @@ npm run lint && npm run typecheck
 CSF Outcome Ledger is built local-first:
 1. All decision records, evidence metadata, and risk entries are stored locally in the browser (`LocalStorage` / `IndexedDB`).
 2. Evidence files are hashed client-side using `window.crypto.subtle.digest('SHA-256')`. Source document contents are never transmitted across the network.
-3. Network calls are restricted to fetching open threat feeds from CISA (`cisa.gov`).
+3. The only network call the app makes for data is to the CISA KEV
+   catalogue, and to the copy of it served alongside the app. Nothing is
+   sent anywhere: both are reads.
 
 ---
 

@@ -26,3 +26,6 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Taken at build time by scripts/fetch-kev-snapshot.mjs.
+public/kev-snapshot.json

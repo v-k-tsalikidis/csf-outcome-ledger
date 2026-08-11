@@ -17,6 +17,20 @@ export const ThreatIntelligencePanel: React.FC<ThreatIntelligencePanelProps> = (
   onRefresh
 }) => {
   const isLive = index.source === 'live';
+  const isSnapshot = index.source === 'build-snapshot';
+  const snapshotDate = index.retrievedAt?.slice(0, 10) ?? '';
+
+  const badgeTone = isLive
+    ? 'bg-teal-50 text-teal-800 border-teal-200/70'
+    : isSnapshot
+      ? 'bg-zinc-100 text-zinc-700 border-zinc-300/70'
+      : 'bg-amber-50 text-amber-800 border-amber-200/70';
+
+  const badgeLabel = isLive
+    ? 'Live feed'
+    : isSnapshot
+      ? `Snapshot — ${snapshotDate}`
+      : `Offline sample — ${OFFLINE_SAMPLE_DATE}`;
 
   return (
     <div className="bg-white border border-zinc-200 rounded-lg p-5 mb-6 shadow-xs">
@@ -27,13 +41,9 @@ export const ThreatIntelligencePanel: React.FC<ThreatIntelligencePanelProps> = (
             CISA Known Exploited Vulnerabilities
           </h2>
           <span
-            className={`text-[10px] font-mono px-2 py-0.5 rounded font-medium border ${
-              isLive
-                ? 'bg-teal-50 text-teal-800 border-teal-200/70'
-                : 'bg-amber-50 text-amber-800 border-amber-200/70'
-            }`}
+            className={`text-[10px] font-mono px-2 py-0.5 rounded font-medium border ${badgeTone}`}
           >
-            {isLive ? 'Live feed' : `Offline sample — ${OFFLINE_SAMPLE_DATE}`}
+            {badgeLabel}
           </span>
         </div>
         <button
@@ -56,11 +66,19 @@ export const ThreatIntelligencePanel: React.FC<ThreatIntelligencePanelProps> = (
             date. This catalogue lists vulnerabilities known to be exploited; it does
             not assess whether any of them apply to your estate.
           </>
+        ) : isSnapshot ? (
+          <>
+            The {index.shown} most recently added records, of{' '}
+            {index.catalogueSize?.toLocaleString()} in the catalogue, copied when this
+            site was last built on {snapshotDate}. CISA does not let a browser read the
+            catalogue directly, so this is a dated copy and not a live feed. Anything
+            added since is not here.
+          </>
         ) : (
           <>
-            The live feed could not be reached, so these are {index.shown} real records
-            saved on {OFFLINE_SAMPLE_DATE}. They are a dated snapshot and should not be
-            read as the current catalogue.
+            Neither the feed nor the copy taken at build time could be read, so these
+            are {index.shown} real records saved on {OFFLINE_SAMPLE_DATE}. They are a
+            dated snapshot and should not be read as the current catalogue.
           </>
         )}
       </p>

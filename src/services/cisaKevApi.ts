@@ -124,29 +124,74 @@ export function summarise(
   };
 }
 
+/** Pick the newest usable records out of a catalogue array. */
+function topEntries(catalogue: unknown[]): CisaKevEntry[] {
+  return catalogue
+    .map(normalise)
+    .filter((e): e is CisaKevEntry => e !== null)
+    .sort((a, b) => b.dateAdded.localeCompare(a.dateAdded))
+    .slice(0, ENTRIES_SHOWN);
+}
+
+async function getJson(url: string): Promise<unknown> {
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), FEED_TIMEOUT_MS);
+  try {
+    const response = await fetch(url, { signal: controller.signal });
+    if (!response.ok) throw new Error(`HTTP ${response.status}`);
+    return (await response.json()) as unknown;
+  } finally {
+    clearTimeout(timeout);
+  }
+}
+
+/**
+ * Read the copy the deploy took, which lives beside the bundle.
+ *
+ * BASE_URL rather than a leading slash: the app is published under
+ * /CSF-Outcome-Ledger/ on GitHub Pages and at the root elsewhere, and a
+ * hardcoded path is wrong in one of those two places.
+ */
+async function fetchBuildSnapshot(): Promise<{
+  entries: CisaKevEntry[];
+  index: ThreatIndex;
+} | null> {
+  try {
+    const data = await getJson(`${import.meta.env.BASE_URL}kev-snapshot.json`);
+    if (typeof data !== 'object' || data === null) return null;
+    const snapshot = data as Record<string, unknown>;
+    const entries = topEntries((snapshot.vulnerabilities as unknown[]) ?? []);
+    if (entries.length === 0) return null;
+    return {
+      entries,
+      index: summarise(
+        entries,
+        'build-snapshot',
+        typeof snapshot.catalogueSize === 'number' ? snapshot.catalogueSize : null,
+        typeof snapshot.retrievedAt === 'string' ? snapshot.retrievedAt : null
+      )
+    };
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * Try for the freshest records that can honestly be obtained, and say which
+ * of the three it managed. Nothing here ever presents a snapshot as live.
+ */
 export async function fetchCisaKevThreatFeed(): Promise<{
   entries: CisaKevEntry[];
   index: ThreatIndex;
 }> {
-  const controller = new AbortController();
-  const timeout = setTimeout(() => controller.abort(), FEED_TIMEOUT_MS);
-
   try {
-    const response = await fetch(CISA_KEV_FEED_URL, { signal: controller.signal });
-    if (!response.ok) throw new Error(`HTTP ${response.status}`);
-
-    const data: unknown = await response.json();
+    const data = await getJson(CISA_KEV_FEED_URL);
     const catalogue =
       typeof data === 'object' && data !== null
         ? (((data as Record<string, unknown>).vulnerabilities as unknown[]) ?? [])
         : [];
 
-    const entries = catalogue
-      .map(normalise)
-      .filter((e): e is CisaKevEntry => e !== null)
-      .sort((a, b) => b.dateAdded.localeCompare(a.dateAdded))
-      .slice(0, ENTRIES_SHOWN);
-
+    const entries = topEntries(catalogue);
     if (entries.length === 0) throw new Error('feed contained no usable records');
 
     return {
@@ -154,17 +199,17 @@ export async function fetchCisaKevThreatFeed(): Promise<{
       index: summarise(entries, 'live', catalogue.length, new Date().toISOString())
     };
   } catch (error) {
-    // The panel states that this is a dated sample, so failing over is
-    // honest rather than silent.
-    console.warn(
-      'CISA KEV feed unavailable, showing the offline sample instead:',
-      error
-    );
-    return {
-      entries: OFFLINE_SAMPLE,
-      index: summarise(OFFLINE_SAMPLE, 'offline-sample', null, null)
-    };
-  } finally {
-    clearTimeout(timeout);
+    // Expected in a browser: the CISA endpoint sends no CORS header, so the
+    // request never leaves. The deploy takes its own copy for exactly this.
+    console.warn('CISA KEV feed not reachable from the browser:', error);
   }
+
+  const snapshot = await fetchBuildSnapshot();
+  if (snapshot) return snapshot;
+
+  // Nothing to read anywhere. The panel says so, with the date.
+  return {
+    entries: OFFLINE_SAMPLE,
+    index: summarise(OFFLINE_SAMPLE, 'offline-sample', null, null)
+  };
 }

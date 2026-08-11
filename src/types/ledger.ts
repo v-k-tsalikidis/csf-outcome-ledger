@@ -87,7 +87,21 @@ export interface CisaKevEntry {
 }
 
 /** Where the displayed entries actually came from. */
-export type ThreatFeedSource = 'live' | 'offline-sample';
+/**
+ * Where the records on screen came from.
+ *
+ * `live` is a direct fetch of the CISA catalogue. A browser cannot do that:
+ * the endpoint sends no Access-Control-Allow-Origin header, so the request
+ * is blocked before it starts. It stays here because the same code runs
+ * behind a proxy, and because CISA could publish the header tomorrow.
+ *
+ * `build-snapshot` is the copy taken by the deploy, server-side, where CORS
+ * does not apply. Same origin, so the browser will load it.
+ *
+ * `offline-sample` is the handful of records compiled into the bundle, for
+ * when there is no snapshot and no network.
+ */
+export type ThreatFeedSource = 'live' | 'build-snapshot' | 'offline-sample';
 
 /**
  * Counts derived from the retrieved entries, and the provenance of those
