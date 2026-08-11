@@ -1,4 +1,13 @@
 @import 'tailwindcss';
+@import './fonts.css';
+
+/* Tailwind v4 reads its theme from CSS and ignores tailwind.config.js
+ * unless it is pointed at explicitly. Without this line the fontFamily
+ * block in that file did nothing: `font-mono`, used 46 times in the
+ * interface, resolved to the browser's default monospace stack, and the
+ * Inter and JetBrains Mono files the page downloaded were never drawn
+ * with. */
+@config "../tailwind.config.js";
 
 :root {
   font-family: 'Inter', system-ui, Avenir, Helvetica, Arial, sans-serif;

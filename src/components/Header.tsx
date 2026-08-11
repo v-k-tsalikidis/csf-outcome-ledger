@@ -54,27 +54,27 @@ export const Header: React.FC<HeaderProps> = ({
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
           {/* Logo & Title */}
-          <div className="flex items-center space-x-3">
-            <div className="w-9 h-9 rounded-lg bg-teal-700 flex items-center justify-center text-white shadow-xs">
+          <div className="flex items-center space-x-2 sm:space-x-3 min-w-0">
+            <div className="w-9 h-9 rounded-lg bg-teal-700 shrink-0 flex items-center justify-center text-white shadow-xs">
               <ShieldCheck className="w-5 h-5" />
             </div>
-            <div>
-              <div className="flex items-center gap-2">
-                <h1 className="text-base font-semibold text-zinc-900 tracking-tight font-sans">
+            <div className="min-w-0">
+              <div className="flex items-center gap-2 min-w-0">
+                <h1 className="text-base font-semibold text-zinc-900 tracking-tight font-sans truncate">
                   CSF Outcome Ledger
                 </h1>
-                <span className="bg-zinc-100 text-zinc-600 text-[10px] font-mono font-medium px-1.5 py-0.5 rounded border border-zinc-200">
+                <span className="hidden sm:inline-block bg-zinc-100 text-zinc-600 text-[10px] font-mono font-medium px-1.5 py-0.5 rounded border border-zinc-200">
                   v1.0.0
                 </span>
               </div>
               <p className="text-xs text-zinc-500 hidden sm:block">
-                NIST CSF 2.0 & SP 800-53 Decision Ledger with Live CISA Threat Feed
+                NIST CSF 2.0 & SP 800-53 Decision Ledger with dated CISA KEV context
               </p>
             </div>
           </div>
 
           {/* Sector Threat Index & EU Regulation Toggle */}
-          <div className="flex items-center space-x-3">
+          <div className="flex items-center space-x-1.5 sm:space-x-3 shrink-0">
             {/* Live Threat Pill */}
             <div className="hidden md:flex items-center gap-2 px-3 py-1.5 bg-zinc-50 border border-zinc-200 rounded-md">
               <Activity className="w-4 h-4 text-zinc-500" />
@@ -115,7 +115,7 @@ export const Header: React.FC<HeaderProps> = ({
               <Globe
                 className={`w-3.5 h-3.5 ${doraOverlayActive ? 'text-teal-600' : 'text-zinc-400'}`}
               />
-              <span>EU DORA / NIS2 Overlay</span>
+              <span className="hidden sm:inline">EU DORA / NIS2 Overlay</span>
               {doraOverlayActive && (
                 <span className="w-1.5 h-1.5 rounded-full bg-teal-600 inline-block"></span>
               )}
@@ -134,9 +134,10 @@ export const Header: React.FC<HeaderProps> = ({
             <button
               onClick={onOpenReportModal}
               className="px-3 py-1.5 text-xs font-medium text-white bg-zinc-900 hover:bg-zinc-800 rounded-md transition-all flex items-center gap-1.5 shadow-xs"
+              title="CISO Board Report"
             >
               <FileText className="w-3.5 h-3.5" />
-              <span>CISO Board Report</span>
+              <span className="hidden sm:inline">CISO Board Report</span>
             </button>
 
             {/* Import JSON */}
