@@ -49,12 +49,14 @@ jobs:
       - name: Build
         run: npm run build
 
+      # Pages has to be switched on once by hand, under
+      # Settings -> Pages -> Build and deployment -> Source: GitHub Actions.
+      # This step used to pass `enablement: true` to do that automatically
+      # and failed: the workflow token cannot turn Pages on for a repository
+      # that has never had it. Reading the existing configuration is what
+      # this action is for.
       - name: Configure Pages
         uses: actions/configure-pages@983d7736d9b0ae728b81ab479565c72886d7745b # v5
-        with:
-          # Turns Pages on for the repository the first time this runs, so
-          # publishing does not depend on someone remembering a setting.
-          enablement: true
 
       # A project site is served from /CSF-Outcome-Ledger/, and vite.config.ts
       # builds the asset paths to match. Serving it from anywhere else needs
