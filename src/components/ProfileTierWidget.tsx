@@ -22,7 +22,12 @@ export const ProfileTierWidget: React.FC<ProfileTierWidgetProps> = ({
   const gapOutcomes = outcomes.filter((o) => decisions[o.id]?.status !== 'SUPPORTED');
   const percentage = Math.round((supportedCount / totalOutcomes) * 100);
 
-  // Compute NIST Implementation Tier
+  // Suggest an Implementation Tier from what has been recorded.
+  //
+  // These thresholds are this tool's, not NIST's. CSF 2.0 states that Tiers
+  // are selected by the organisation and are not maturity levels, so nothing
+  // here should be presented as a determination. The rule is written out in
+  // the interface so a reader can see it and disagree with it.
   let currentTierName = 'Tier 1: Partial';
   let currentTierLevel = 1;
   let tierDescription =
@@ -68,7 +73,7 @@ export const ProfileTierWidget: React.FC<ProfileTierWidgetProps> = ({
           </div>
         </div>
         <span className="font-mono text-xs font-semibold text-indigo-700 bg-indigo-50 px-2.5 py-1 rounded border border-indigo-200">
-          {percentage}% Compliance Match
+          {supportedCount} of {totalOutcomes} outcomes recorded
         </span>
       </div>
 
@@ -79,7 +84,7 @@ export const ProfileTierWidget: React.FC<ProfileTierWidgetProps> = ({
           <div>
             <div className="flex items-center justify-between mb-2">
               <span className="text-[10px] uppercase font-semibold text-zinc-500 tracking-wider">
-                Current Profile (Baseline)
+                Current Profile (Suggested)
               </span>
               <span className="bg-zinc-200 text-zinc-800 font-mono text-[10px] font-semibold px-2 py-0.5 rounded">
                 Level {currentTierLevel} of 4
@@ -125,6 +130,20 @@ export const ProfileTierWidget: React.FC<ProfileTierWidgetProps> = ({
           </div>
         </div>
       </div>
+
+      {/* Where the suggested tier comes from, so it can be argued with. */}
+      <p className="text-[11px] text-zinc-500 leading-relaxed mb-5">
+        <span className="font-semibold text-zinc-600">
+          The tier above is a suggestion from this tool, not a determination.
+        </span>{' '}
+        NIST CSF 2.0 states that Implementation Tiers are selected by the organisation
+        and are not maturity levels. This tool reads them off the outcomes you have
+        recorded: Risk-Informed once a third are supported, Repeatable at two thirds
+        with evidence hashed against most of them, and Adaptive at nine tenths. That
+        rule is written here so you can see it and overrule it. It is not a compliance
+        score, and no percentage of recorded outcomes tells anyone whether the controls
+        behind them work.
+      </p>
 
       {/* Required Action List to Reach Next Tier */}
       {gapOutcomes.length > 0 && (
